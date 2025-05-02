@@ -1,0 +1,9 @@
+<template>
+<div t-name="layout" class="layout">
+<div id="layers">
+layers here !
+</div>
+<div id="main">main</div>
+<div id="sidebar">sd</div>
+</div>
+</template>

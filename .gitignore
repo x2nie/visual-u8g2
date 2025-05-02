@@ -4,6 +4,5 @@ package-lock.json
 .vscode/
 lib/
 dist/
-tools/
 **.DS_Store
 .parcel-cache
