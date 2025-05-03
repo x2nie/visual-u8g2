@@ -37,6 +37,7 @@ body, html {
             flex-grow: 0;
             flex-shrink: 0;
             position: relative;
+            overflow: auto;
         }
         
         #source-code{
