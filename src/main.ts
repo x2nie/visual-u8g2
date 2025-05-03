@@ -1,5 +1,6 @@
 import { loadFile, mount, reactive, whenReady } from "@odoo/owl";
 import App from './App'
+import { nokia5110 } from "./displays/Displays";
 
 whenReady(async function () {
 
@@ -12,8 +13,12 @@ whenReady(async function () {
 
   const env = {
     editor: reactive({
-      content: cpp_content,
-    })
+              content: cpp_content,
+            }),
+    sim: reactive({
+          display_name: nokia5110.name,
+          layers: []
+          })
   }
 
   mount(App, document.body, { 

@@ -5,7 +5,7 @@ monaco.editor.defineTheme('tomorrow-night', {
     base: 'vs-dark',
     inherit: true,
     rules: [
-        { token: 'comment', foreground: '#969896', fontStyle: 'italic' },
+        { token: 'comment', foreground: '#606685', fontStyle: 'italic' },
         { token: 'keyword', foreground: '#c397d8' },
         { token: 'number', foreground: '#e78c45' },
         { token: 'string', foreground: '#b9ca4a' },

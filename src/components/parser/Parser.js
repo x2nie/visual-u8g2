@@ -1,19 +1,44 @@
-import { Component, xml } from "@odoo/owl";
+import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
 import { transpile } from "../../util/cpp2javascript";
-import { U8G2_EVAL, EVAL_CALLS } from "./u8g2_eval";
+import { parse_ino } from "./u8g2_eval";
+import { displays } from "../../displays/Displays";
+import { runCode, U8G2 } from "../../util/U8G2";
 
-const CALL_LOOP = '; try{ loop(); } catch(err) {console.log("error-evaluate-loop:"+err.message);}'
+const CALL_LOOP = '; try{ setup(); loop(); } catch(err) {console.log("error-evaluate-loop:"+err.message);}'
 export class Parser extends Component{
+    setup(){
+        this.canvasRef = useRef('canvas')
+        this.canvas = null;
+        this.ctx = null;
+        this.sim = useState(this.env.sim);
+        this.display = displays.find(d => d.name == this.sim.display_name)
+
+        useEffect(
+            (canvas)=>{
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d')
+                this.u8g2 = new U8G2(this.ctx, this.display)
+                this.btnClick()
+            },
+            ()=>[this.canvasRef.el]
+        )
+    }
 
     btnClick(){
         let code = this.env.editor.content;
         code = transpile(code)
         console.log(code)
-        const u8g2 = U8G2_EVAL; //* DO NOT REMOVE THIS LINE. requires by eval.
-        eval(code + CALL_LOOP)
-        for(const d of EVAL_CALLS){
+
+        const layers = parse_ino(code + CALL_LOOP)
+        for(const d of layers){
             console.log(d)
         }
+        this.sim.layers = layers
+
+        // const {u8g2} = this;
+        // eval(code + CALL_LOOP)
+        runCode(this.u8g2, code + CALL_LOOP)
+
 
     }
     /*btnClick(){
@@ -37,4 +62,8 @@ export class Parser extends Component{
 
 Parser.template = xml`
     <button t-on-click="btnClick">Parse!</button>
+    <canvas t-portal="'#canvas-container'" t-ref="canvas" 
+        class="lcd-canvas"
+        t-att-width="display.width" t-att-height="display.height"
+    />
 `

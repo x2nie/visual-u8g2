@@ -1,5 +1,5 @@
 import { Display } from "../displays/DisplayApi";
-import courB12 from "bundle-text:../bdf/courB12.bdf";
+// import courB12 from "bundle-text:../bdf/courB12.bdf";
 import { BDFFont } from 'bdf-canvas';
 
 export type CIRC_OPT =
@@ -9,10 +9,21 @@ export type CIRC_OPT =
     "U8G2_DRAW_LOWER_RIGHT" |
     "U8G2_DRAW_ALL";
 
+const U8G2_DRAW_UPPER_RIGHT = 0x01;
+const U8G2_DRAW_UPPER_LEFT =  0x02;
+const U8G2_DRAW_LOWER_LEFT = 0x04;
+const U8G2_DRAW_LOWER_RIGHT =  0x08;
+const U8G2_DRAW_ALL = (U8G2_DRAW_UPPER_RIGHT|U8G2_DRAW_UPPER_LEFT|U8G2_DRAW_LOWER_RIGHT|U8G2_DRAW_LOWER_LEFT);
+    
+
 export interface FontMap {
     [key: string]: {
         bdfFont: { drawText(ctx: CanvasRenderingContext2D, str: string, x: number, y: number): void } | null
     };
+}
+
+export function runCode(u8g2: U8G2, code: string){
+    return eval(code)
 }
 
 export class U8G2 {
@@ -23,6 +34,9 @@ export class U8G2 {
     constructor(private ctx: CanvasRenderingContext2D, private display: Display) {
         this.ctx.lineWidth = 1;
         this.ctx.imageSmoothingEnabled = false;
+        ctx.fillStyle = display.colorMap[display.resetColor];
+        ctx.fillRect(0, 0, display.width, display.height);
+
     }
 
     getDisplay() {

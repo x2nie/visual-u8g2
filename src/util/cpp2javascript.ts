@@ -28,7 +28,7 @@ export const transpile = (code: string) => {
             line = line.replace(/bool /g, "var ");
 
         }
-        line = line.replace(/(U8G2_[a-zA-Z0-9_-]*)/g, "\"$1\"");
+        // line = line.replace(/(U8G2_[a-zA-Z0-9_-]*)/g, "\"$1\"");
         line = line.replace(/_tf/g, "");
         line = line.replace(/(u8g2_font_[a-zA-Z0-9_-]*)/g, "\"$1\"");
         line = line.replace(/\.length\(\)/g, ".length");

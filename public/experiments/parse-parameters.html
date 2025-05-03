@@ -33,7 +33,8 @@
 
   <h2>Function Parameter Parser (with getOrd)</h2>
   <p>Masukkan pemanggilan fungsi di bawah:</p>
-  <textarea id="inputCode">drawSomething(x + 5, y - 2, r*.8, 100, cx)</textarea>
+  <textarea id="inputCode">u8g2.drawLine(rpx(cx, r1, angle),rpy(cy, r1, angle),
+    rpx(cx, r2, angle),rpy(cy, r2, angle)); drawSomething(x + 5, y - 2, r*.8, 100, cx)</textarea>
   <br>
   <button onclick="parseParams()">Parse</button>
 
@@ -56,7 +57,8 @@
         const char = paramStr[i];
 
         if (char === ',' && parenDepth === 0) {
-          params.push(current.trim());
+        //   params.push(current.trim());
+          params.push(current);
           current = '';
         } else {
           if (char === '(') parenDepth++;
@@ -65,7 +67,8 @@
         }
       }
 
-      if (current.trim()) params.push(current.trim());
+    //   if (current.trim()) params.push(current.trim());
+      if (current) params.push(current);
 
       return params;
     }
@@ -95,12 +98,13 @@
       const params = extractFunctionParams(code);
       const output = params.map((p, i) => {
         const ord = getOrd(p);
-        return `Param ${i + 1}: ${p} → getOrd = ${ord}`;
+        return `Param ${i + 1}: >"${p}"< → getOrd = ${ord}`;
       }).join('\n');
 
       document.getElementById('output').textContent = output;
     }
   </script>
 
+  <script>window.onload = parseParams</script>
 </body>
 </html>

@@ -7,8 +7,10 @@
         <div  class="layout">
             <div id="layers">
                 layers here ! 
+                <LayerBox/>
             </div>
-            <div id="mid">main
+            <div id="mid">
+                <div id="canvas-container"></div>
                 <Editor/>
             </div>
             <div id="sidebar">sd</div>
