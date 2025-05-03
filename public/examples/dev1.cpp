@@ -4,7 +4,7 @@ void setup(void) {
     //u8g2.setFont(u8g2_font_helvB12_tr);
 }
 void draw(const char *s) {
-    int b = 100;
+    int b = 20;
     u8g2.setDrawColor(1);
     u8g2.drawLine(1, 0, 10, 10);
     u8g2.drawLine(b, b*2, b+3, b-5);

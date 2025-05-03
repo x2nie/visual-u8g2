@@ -7,6 +7,7 @@ import { runCode, U8G2 } from "../../util/U8G2";
 const CALL_LOOP = '; try{ setup(); loop(); } catch(err) {console.log("error-evaluate-loop:"+err.message);}'
 export class Parser extends Component{
     setup(){
+        this.state = useState({x:0, y:0})
         this.canvasRef = useRef('canvas')
         this.canvas = null;
         this.ctx = null;
@@ -38,32 +39,26 @@ export class Parser extends Component{
         // const {u8g2} = this;
         // eval(code + CALL_LOOP)
         runCode(this.u8g2, code + CALL_LOOP)
-
-
     }
-    /*btnClick(){
-        const code = this.env.editor.content;
-        const regex = /u8g2\.\w+[^;]+;/g;
-        let m;
 
-        while ((m = regex.exec(code)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-            
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                console.log(`Found match, group ${groupIndex}: ${match}`);
-            });
-        }
-    }*/
+    canvasMouseMove(ev){
+        const scale = this.sim.scale
+        const round = (n) => Math.floor(n)
+        // console.log(`x:${round(ev.offsetX/scale)} y:${round(ev.offsetY / scale)}`)
+        this.state.x = ev.offsetX * scale;
+        this.state.y = ev.offsetY * scale;
+        console.log(`x:${ev.offsetX} y:${ev.offsetY}`)
+    }
 }
 
 Parser.template = xml`
     <button t-on-click="btnClick">Parse!</button>
     <canvas t-portal="'#canvas-container'" t-ref="canvas" 
         class="lcd-canvas"
+        t-on-mousemove="canvasMouseMove"
         t-att-width="display.width" t-att-height="display.height"
+        t-attf-style="transform: scale(#{sim.scale});"
     />
+    <!-- <div t-portal="'#canvas-container'" class="box" 
+        t-attf-style="left: #{state.x}px; top: #{state.y}px; width:#{sim.scale}px; height:#{sim.scale}px;"/> -->
 `

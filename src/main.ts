@@ -17,6 +17,7 @@ whenReady(async function () {
             }),
     sim: reactive({
           display_name: nokia5110.name,
+          scale:18,
           layers: []
           })
   }
