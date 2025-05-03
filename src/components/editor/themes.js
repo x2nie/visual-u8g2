@@ -244,20 +244,26 @@ monaco.editor.defineTheme('tomorrow-night0', {
       "editorCursor.foreground": "#AEAFAD",
       "editorWhitespace.foreground": "#4B4E55"
     }
-  })
-  // Definisikan tema TomorrowNight
-  monaco.editor.defineTheme('tomorrow-night', {
+})
+// Definisikan tema TomorrowNight
+monaco.editor.defineTheme('tomorrow-night', {
     base: 'vs-dark',
     inherit: true,
     rules: [
-      { token: 'comment', foreground: '#969896', fontStyle: 'italic' },
-      { token: 'keyword', foreground: '#c397d8' },
-      { token: 'number', foreground: '#e78c45' },
-      { token: 'string', foreground: '#b9ca4a' },
-      { token: 'type', foreground: '#7aa6da' },
-      { token: 'delimiter', foreground: '#eaeaea' },
-      { token: 'operator', foreground: '#eaeaea' },
-      // Tambahkan aturan token lainnya sesuai kebutuhan
+        { token: 'comment', foreground: '#969896', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '#c397d8' },
+        { token: 'number', foreground: '#e78c45' },
+        { token: 'string', foreground: '#b9ca4a' },
+        { token: 'type', foreground: '#7aa6da' },
+        { token: 'delimiter', foreground: '#eaeaea' },
+        { token: 'operator', foreground: '#eaeaea' },
+        // Tambahkan aturan token lainnya sesuai kebutuhan
+
+        // Aturan khusus untuk instance (u8g2)
+        { token: 'variable.instance.cpp', foreground: '#7aa6da' }, // Warna biru seperti tipe
+        { token: 'object.ino', foreground: '#7aa6da' }, // Warna biru seperti tipe
+        // { token: 'method.ino', foreground: '#b9ca4a' }, // Warna hijau seperti string
+
     ],
     colors: {
       'editor.background': '#1d1f21',
@@ -267,5 +273,5 @@ monaco.editor.defineTheme('tomorrow-night0', {
       'editor.selectionBackground': '#373b41',
       'editor.inactiveSelectionBackground': '#282a2e',
     }
-  })
+})
   

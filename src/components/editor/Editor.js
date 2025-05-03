@@ -2,6 +2,7 @@
 import { Component, onMounted, useRef } from "@odoo/owl";
 import * as monaco from "monaco-editor";
 import './themes'
+import './lang_ino'
 
 
 const SAMPLE_CPP = `void draw(U8G2 u8g2) {
@@ -35,8 +36,8 @@ export class Editor extends Component {
     onMounted(() => {
       monaco.editor.create(this.editorRef.el, {
         value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
-        language: "cpp",
-        // language: "arduino",
+        // language: "cpp",
+        language: "ino",
         // theme: "vs-dark",
         theme: "tomorrow-night",
         automaticLayout: true,
