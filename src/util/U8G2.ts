@@ -434,61 +434,17 @@ export class U8G2 {
             return;
         }
 
-        const w = Math.abs(x1 - x0);
-        const h = Math.abs(y1 - y0);
-        // let s = Math.floor(w / Math.abs(y1 - y0));
-        // s = s === 0 ? 1 : s;
+        // https://rosettacode.org/wiki/Bitmap/Bresenham's_line_algorithm#JavaScript
+        const dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        const dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
+        let err = (dx>dy ? dx : -dy)/2;
 
-        if (h > w) {
-            const s = w / Math.abs(y1 - y0);
-            // line is higher than wide:
-            if (x0 < x1) {
-                let y = 0;
-                for (let x = 0; x < w; x += s) {
-                    this.drawHLine(x0 + x, y0 + y, s);
-                    if (y0 < y1) {
-                        y++;
-                    } else {
-                        y--;
-                    }
-                }
-            }
-            if (x0 > x1) {
-                let y = 0;
-                for (let x = 0; x < w; x += s) {
-                    this.drawHLine(x1 + x, y1 + y, s);
-                    if (y0 > y1) {
-                        y++;
-                    } else {
-                        y--;
-                    }
-                }
-            }
-        } else {
-            const s = h / Math.abs(x1 - x0);
-            // line is wider than high:
-            if (y0 < y1) {
-                let x = 0;
-                for (let y = 0; y < h; y += s) {
-                    this.drawVLine(x0 + x, y0 + y, s);
-                    if (x0 < x1) {
-                        x++;
-                    } else {
-                        x--;
-                    }
-                }
-            }
-            if (y0 > y1) {
-                let x = 0;
-                for (let y = 0; y < h; y += s) {
-                    this.drawVLine(x1 + x, y1 + y, s);
-                    if (x0 > x1) {
-                        x++;
-                    } else {
-                        x--;
-                    }
-                }
-            }
+        while (true) {
+            this.drawPixel(x0,y0);//setPixel(x0,y0);
+            if (x0 === x1 && y0 === y1) break;
+            const e2 = err;
+            if (e2 > -dx) { err -= dy; x0 += sx; }
+            if (e2 < dy) { err += dx; y0 += sy; }
         }
     }
 
