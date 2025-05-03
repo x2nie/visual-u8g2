@@ -1,13 +1,18 @@
-import { loadFile, mount, whenReady } from "@odoo/owl";
+import { loadFile, mount, reactive, whenReady } from "@odoo/owl";
 import App from './App'
 
 whenReady(async function () {
 
-  const [templates] = await Promise.all([
+  const [templates, cpp_content] = await Promise.all([
     loadFile("templates.xml"),
+    loadFile("examples/intro.raw.cpp"),
   ])
 
-  const env = {}
+  const env = {
+    editor: reactive({
+      content: cpp_content,
+    })
+  }
 
   mount(App, document.body, { 
       env, 

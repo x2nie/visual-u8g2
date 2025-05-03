@@ -35,7 +35,8 @@ export class Editor extends Component {
 
     onMounted(() => {
       monaco.editor.create(this.editorRef.el, {
-        value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
+        // value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
+        value: this.env.editor.content,
         // language: "cpp",
         language: "ino",
         // theme: "vs-dark",
