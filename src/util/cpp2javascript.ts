@@ -11,6 +11,7 @@ export const transpile = (code: string) => {
     lines = lines.map(line => {
         if (line.startsWith("void") || line.startsWith("uint")) {
             line = line.replace(/^void /g, "function ");
+            line = line.replace(/\(void\)/g, "()");
             line = line.replace(/^u?int((8|16|32)_t)? /g, "function ");
 
             line = line.replace(/U8G2 u8g2/g, "u8g2");
@@ -19,6 +20,7 @@ export const transpile = (code: string) => {
             line = line.replace(/double /g, "");
             line = line.replace(/String /g, "");
             line = line.replace(/bool /g, "");
+            line = line.replace(/const char \*/g, "");
         } else {
             line = line.replace(/u?int((8|16|32)_t)? /g, "var ");
             line = line.replace(/float /g, "var ");

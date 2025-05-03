@@ -5,7 +5,9 @@ whenReady(async function () {
 
   const [templates, cpp_content] = await Promise.all([
     loadFile("templates.xml"),
-    loadFile("examples/intro.raw.cpp"),
+
+    // loadFile("examples/intro.raw.cpp"),
+    loadFile("examples/dev1.cpp"),
   ])
 
   const env = {

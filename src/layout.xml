@@ -2,7 +2,7 @@
 
     <div t-name="App" class="main">
         <div id="navbar">
-
+            <Parser/>
         </div>
         <div  class="layout">
             <div id="layers">

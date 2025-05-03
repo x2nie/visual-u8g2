@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Function Parameter Parser with getOrd</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-family: monospace;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    pre {
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Function Parameter Parser (with getOrd)</h2>
+  <p>Masukkan pemanggilan fungsi di bawah:</p>
+  <textarea id="inputCode">drawSomething(x + 5, y - 2, r*.8, 100, cx)</textarea>
+  <br>
+  <button onclick="parseParams()">Parse</button>
+
+  <h3>Hasil:</h3>
+  <pre id="output"></pre>
+
+  <script>
+    function extractFunctionParams(code) {
+      const start = code.indexOf('(');
+      const end = code.lastIndexOf(')');
+      if (start === -1 || end === -1 || end <= start) return [];
+
+      const paramStr = code.slice(start + 1, end);
+      const params = [];
+
+      let current = '';
+      let parenDepth = 0;
+
+      for (let i = 0; i < paramStr.length; i++) {
+        const char = paramStr[i];
+
+        if (char === ',' && parenDepth === 0) {
+          params.push(current.trim());
+          current = '';
+        } else {
+          if (char === '(') parenDepth++;
+          else if (char === ')') parenDepth--;
+          current += char;
+        }
+      }
+
+      if (current.trim()) params.push(current.trim());
+
+      return params;
+    }
+
+    function getOrd(param) {
+      param = param.trim();
+
+      // Jika literal angka
+      if (/^[+-]?\d+(\.\d+)?$/.test(param)) {
+        return parseFloat(param);
+      }
+
+      // Jika bentuk: identifier + number (misal: x + 5, y - 3.2)
+      const match = param.match(/^[\w.]+\s*([+-])\s*(\d+(\.\d+)?)/);
+      if (match) {
+        const sign = match[1] === '-' ? -1 : 1;
+        const number = parseFloat(match[2]);
+        return sign * number;
+      }
+
+      // Selain itu, tidak dikenali
+      return null;
+    }
+
+    function parseParams() {
+      const code = document.getElementById('inputCode').value;
+      const params = extractFunctionParams(code);
+      const output = params.map((p, i) => {
+        const ord = getOrd(p);
+        return `Param ${i + 1}: ${p} → getOrd = ${ord}`;
+      }).join('\n');
+
+      document.getElementById('output').textContent = output;
+    }
+  </script>
+
+</body>
+</html>
