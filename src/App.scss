@@ -8,10 +8,18 @@ body, html {
     background: #181f2c;
     color: #c5c8c6;
     flex-direction: column;
+    --navbar-height: 48px;
+    --lcd-area-height: 215px;
+
+    #navbar{
+        height: 48px;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.33);
+    }
 }
 .layout {
     display: flex;
     align-items: stretch;
+    height: calc(100vh - var(--navbar-height));
 
     #layers {
         // background: lime;
@@ -21,6 +29,21 @@ body, html {
     #mid {
         // background: red;
         flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+
+        #canvas-container{
+            height: var(--lcd-area-height);
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+        
+        #source-code{
+            flex-grow: 1;
+            flex-shrink: 1;
+            background: yellow;
+            height: calc(100vh - var(--navbar-height) - var(--lcd-area-height));
+        }
     }
 
     #sidebar{
@@ -31,7 +54,8 @@ body, html {
 
 .lcd-canvas {
     border: 2px solid #225a94;
+    box-sizing: content-box;
     image-rendering: pixelated;
-    transform: scale(2);
-    transform-origin: top;
+    transform: scale(4);
+    transform-origin: top left;
 }
