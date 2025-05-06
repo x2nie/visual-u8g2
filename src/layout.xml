@@ -2,7 +2,7 @@
 
     <div t-name="App" class="main">
         <div id="navbar">
-            <Parser/>
+            <!-- <Parser/> -->
         </div>
         <div  class="layout">
             <div id="layers">
@@ -11,7 +11,8 @@
             </div>
             <div id="mid">
                 <div id="preview" t-attf-style="--sim-scale: #{sim.scale};">
-                    <div id="device" t-attf-style="transform: scale(#{sim.scale});"></div>
+                    <!-- <div id="device" t-attf-style="transform: scale(#{sim.scale});"></div> -->
+                     <Device/>
                 </div> 
                 <Editor/>
             </div>
