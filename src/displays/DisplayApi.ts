@@ -9,4 +9,5 @@ export interface Display {
     resetColor: number;
     colorMap: ColorMap;
     css?:string;
+    scrollTop?: number;
 }

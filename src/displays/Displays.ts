@@ -62,11 +62,14 @@ export const nokia3210: Display = {
     resetColor: 0,
     colorMap: {
         0: "transparent",
-        1: "#383838"
+        // 1: "#383838"
+        1: "#252525"
     },
-    css: `#preview{background:silver;} 
-        #device{width: 127px;height: 202px; background-image: url(skin/nokia-3210.png); top: calc( var(--sim-scale) * -55px)} 
-        #lcd{left:27px;  top:64px;transform: scaleX(0.84);    background-blend-mode: overlay;}`
+    scrollTop: 55,
+    css: `#preview{background:#131416;} 
+        #device{width: 127px;height: 202px; background-image: url(skin/nokia-3210.png); top0: calc( var(--sim-scale) * -55px)} 
+        #lcd{left:27px;  top:64px;transform: scaleX(0.84);    background-blend-mode: overlay; }`
+        // filter: drop-shadow(1px 1px rgba(0, 0, 0, 0.2));
 };
 
 export const nokia5110: Display = {

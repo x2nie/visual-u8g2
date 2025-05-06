@@ -1,4 +1,4 @@
-import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
+import { Component, onMounted, useEffect, useRef, useState, xml } from "@odoo/owl";
 import { transpile } from "../../util/cpp2javascript";
 import { parse_ino } from "./u8g2_eval";
 import { displays } from "../../displays/Displays";
@@ -23,6 +23,12 @@ export class Parser extends Component{
             },
             ()=>[this.canvasRef.el]
         )
+
+        onMounted(()=>{
+            if(this.display.scrollTop){
+                this.canvas.parentElement.parentElement.scrollTop = (this.display.scrollTop * this.sim.scale)
+            }
+        })
     }
 
     btnClick(){
