@@ -3,6 +3,7 @@
     <div t-name="App" class="main" t-attf-style="--preview-height: #{heights.preview}px;">
         <div id="navbar">
             <!-- <Parser/> -->
+            <Zoom/>
         </div>
         <div  class="layout">
             <div id="layers">

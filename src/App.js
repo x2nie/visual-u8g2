@@ -5,10 +5,11 @@ import { LayerBox } from "./components/layers/LayerBox";
 import Device from "./components/device/Device";
 
 import './App.scss'
+import Zoom from "./components/zoom/Zoom";
 // import './style.scss'
 
 export default class App extends Component {
-    static components = {Editor, Device, LayerBox}
+    static components = {Editor, Device, LayerBox, Zoom}
     static template = "App"
 
     setup(){
