@@ -46,12 +46,12 @@ export default class Device extends Component {
     renderLcd(){
         let code = this.env.editor.content;
         code = transpile(code)
-        console.log(code)
+        // console.log(code)
 
         const layers = parse_ino(code + CALL_LOOP)
-        for(const d of layers){
-            console.log(d)
-        }
+        // for(const d of layers){
+        //     console.log(d)
+        // }
         this.sim.layers = layers
 
         // const {u8g2} = this;
@@ -84,12 +84,13 @@ export default class Device extends Component {
         const layer = this.layer;
         if(layer){
             // ctx.fillStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 5]);
             ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
             
             const {x,y,w,h} = layer.bound;
             const s = this.sim.scale
-            console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
+            // console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
             // ctx.rect(x, y, w, h);
             // ctx.strokeRect(x, y, w, h);
             ctx.strokeRect(x*s, y*s, w*s, h*s);

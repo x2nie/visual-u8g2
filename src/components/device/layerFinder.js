@@ -1,6 +1,6 @@
 export function layerAt(x,y, layers){
     layers.forEach(assureBound);
-    return layers.find(layer => {
+    return layers.toReversed().find(layer => {
         const box = layer.bound
         return (x >= box.x && x <= box.x + box.w &&
             y >= box.y && y <= box.y + box.h) 
@@ -32,5 +32,5 @@ function assureBound(layer){
         default:
             break;
     }
-    console.log(layer.f, layer.bound)
+    // console.log(layer.f, layer.bound)
 }

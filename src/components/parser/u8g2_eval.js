@@ -13,7 +13,7 @@ const EVAL_CALLS = [];
  * @param {Array} args Arguments passed to function
  */
 function add(f, l, args){
-    console.log(`${f} dipanggil di baris ${l} dengan params: ${[...args]}`);
+    // console.log(`${f} dipanggil di baris ${l} dengan params: ${[...args]}`);
     EVAL_CALLS.push({f, l, args})
 }
 

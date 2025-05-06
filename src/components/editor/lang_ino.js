@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-console.log(monaco)
+// console.log(monaco)
 
 // Clone definisi bahasa C++ dan tambahkan fitur Arduino
 // function setupInoLanguage() {
