@@ -8,13 +8,14 @@ const CALL_LOOP = '; try{ setup(); loop(); } catch(err) {console.log("error-eval
 
 export default class Device extends Component {
     setup(){
-        this.state = useState({x:0, y:0, hoverLayer:null})
+        this.state = useState({x:0, y:0})
         this.deviceRef = useRef('device')
         this.helperRef = useRef('helper')
         this.canvasRef = useRef('canvas')
         this.canvas = null;
         this.ctx = null;
         this.sim = useState(this.env.sim);
+        this.layer = null; // layer on mouse move
 
         useEffect(
             (canvas)=>{
@@ -67,14 +68,20 @@ export default class Device extends Component {
         // console.log(`x:${ev.offsetX} y:${ev.offsetY}`)
         const x = ev.offsetX;
         const y = ev.offsetY;
-        const layer = layerAt(x,y, this.sim.layers)
+        this.layer = layerAt(x,y, this.sim.layers)
         // console.log(`x:${x} y:${y} layer:`, layer ? layer.bound: null)
-        this.drawHelper(layer)
+        this.drawHelper()
     }
-    drawHelper(layer){
+    canvasMouseOut(){
+        this.layer = null;
+        this.drawHelper()
+    }
+    drawHelper(){
         const canvas = this.helperRef.el;
         const ctx = canvas.getContext('2d')
         ctx.clearRect(0,0,canvas.width, canvas.height)
+
+        const layer = this.layer;
         if(layer){
             // ctx.fillStyle = 'white';
             ctx.strokeStyle = 'white';
@@ -97,6 +104,7 @@ Device.template = xml`
         <canvas t-ref="canvas" 
             class="lcd"
             t-on-mousemove="canvasMouseMove"
+            t-on-mouseleave="canvasMouseOut"
             t-att-width="display.width" t-att-height="display.height"
             />
         <canvas t-ref="helper" 
