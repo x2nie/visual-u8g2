@@ -2,13 +2,15 @@ import { Component, onMounted, useEffect, useRef, useState, xml } from "@odoo/ow
 import { runCode, U8G2 } from "../../util/U8G2";
 import { transpile } from "../../util/cpp2javascript";
 import { parse_ino } from "../parser/u8g2_eval";
+import { layerAt } from "./layerFinder";
 
 const CALL_LOOP = '; try{ setup(); loop(); } catch(err) {console.log("error-evaluate-loop:"+err.message);}'
 
 export default class Device extends Component {
     setup(){
-        this.state = useState({x:0, y:0})
+        this.state = useState({x:0, y:0, hoverLayer:null})
         this.deviceRef = useRef('device')
+        this.helperRef = useRef('helper')
         this.canvasRef = useRef('canvas')
         this.canvas = null;
         this.ctx = null;
@@ -22,6 +24,11 @@ export default class Device extends Component {
                 this.renderLcd()
             },
             ()=>[this.canvasRef.el]
+        )
+
+        useEffect(
+            (layer) =>{},
+            () => [this.state.hoverLayer]
         )
 
         onMounted(()=>{
@@ -55,9 +62,31 @@ export default class Device extends Component {
         const scale = this.sim.scale
         // const round = (n) => Math.floor(n)
         // console.log(`x:${round(ev.offsetX/scale)} y:${round(ev.offsetY / scale)}`)
-        this.state.x = ev.offsetX * scale;
-        this.state.y = ev.offsetY * scale;
-        console.log(`x:${ev.offsetX} y:${ev.offsetY}`)
+        // this.state.x = ev.offsetX * scale;
+        // this.state.y = ev.offsetY * scale;
+        // console.log(`x:${ev.offsetX} y:${ev.offsetY}`)
+        const x = ev.offsetX;
+        const y = ev.offsetY;
+        const layer = layerAt(x,y, this.sim.layers)
+        // console.log(`x:${x} y:${y} layer:`, layer ? layer.bound: null)
+        this.drawHelper(layer)
+    }
+    drawHelper(layer){
+        const canvas = this.helperRef.el;
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0,0,canvas.width, canvas.height)
+        if(layer){
+            // ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
+            
+            const {x,y,w,h} = layer.bound;
+            const s = this.sim.scale
+            console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
+            // ctx.rect(x, y, w, h);
+            // ctx.strokeRect(x, y, w, h);
+            ctx.strokeRect(x*s, y*s, w*s, h*s);
+        }
     }
 }
 
@@ -66,9 +95,14 @@ Device.template = xml`
     <style t-if="display.css" type="text/css" t-out="display.css"></style>
     <div id="device" t-attf-style="transform: scale(#{sim.scale});" t-ref="device">
         <canvas t-ref="canvas" 
-            id="lcd"
+            class="lcd"
             t-on-mousemove="canvasMouseMove"
             t-att-width="display.width" t-att-height="display.height"
+            />
+        <canvas t-ref="helper" 
+            class="lcd no-mouse"
+            t-att-width="display.width*sim.scale" t-att-height="display.height*sim.scale"
+            t-attf-style="width:#{display.width}px; height:#{display.height}px;"
             />
     </div>
 `

@@ -4,7 +4,7 @@
 <div t-ref="editorContainer" style="width: 100%;" id="source-code"></div>
 </t>
 </template>
-<div t-name="App" class="main">
+<div t-name="App" class="main" t-attf-style="--preview-height: #{heights.preview}px;">
 <div id="navbar">
 </div>
 <div  class="layout">
@@ -16,6 +16,7 @@ layers here !
 <div id="preview" t-attf-style="--sim-scale: #{sim.scale};">
 <Device/>
 </div> 
+<div class="separator horizontal" t-on-mousedown="onSplitterMouseDown"/>
 <Editor/>
 </div>
 <div id="sidebar">sd</div>

@@ -2,6 +2,9 @@ body, html {
     margin: 0;
     padding: 0;
 }
+.no-mouse {
+    pointer-events: none;
+}
 .main {
     display: flex;
     height: 100vh;
@@ -10,6 +13,7 @@ body, html {
     flex-direction: column;
     --navbar-height: 48px;
     --preview-height: 215px;
+    --separator-height: 10px;
 
     #navbar{
         height: 48px;
@@ -47,7 +51,7 @@ body, html {
             flex-grow: 1;
             flex-shrink: 1;
             background: yellow;
-            height: calc(100vh - var(--navbar-height) - var(--preview-height));
+            height: calc(100vh - var(--navbar-height) - var(--preview-height) - var(--separator-height));
         }
     }
 
@@ -66,8 +70,8 @@ body, html {
     transform-origin: top left;
     // top: calc( 3 * -55px);
     
-    #lcd {
-        position: relative;
+    .lcd {
+        position: absolute;
         // left:27px;
         // top:64px;
         // border: 2px solid #225a94;
@@ -87,3 +91,21 @@ body, html {
     position: absolute;
     pointer-events: none;
 }
+
+/* SEPARATOR ****************************************/
+
+.separator {
+    background-color: #1c2128;
+    flex-shrink: 0;
+    flex-grow: 0;
+    
+    &.vertical {
+        cursor: col-resize;
+        width: 8px;
+    }
+    &.horizontal {
+        height: 10px;
+        cursor: row-resize;
+    }
+}
+  

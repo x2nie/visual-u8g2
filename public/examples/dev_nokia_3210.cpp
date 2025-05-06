@@ -10,7 +10,9 @@ void draw(const char *s) {
     u8g2.drawLine(83, 0, 83, 47);
     u8g2.drawLine(0,47, 83,47);
     u8g2.drawLine(0,0, 0, 47);
-    u8g2.drawLine(b, b*2, b+3, b-5);
+    // u8g2.drawLine(b, b*2, b+3, b-5);
+
+    u8g2.drawLine(20, 5, 5, 32);
     // u8g2.drawPixel(3, 0);
     // u8g2.setFont(u8g2_font_5x8);
     // u8g2.drawStr(1,16,"Hi, this editor supports");
@@ -24,8 +26,10 @@ void draw(const char *s) {
     // }
     // u8g2.drawCircle(10,20,13);
     u8g2.drawEllipse(17, 10, 10, 10);
-    u8g2.drawCircle(21,32,13, U8G2_DRAW_UPPER_RIGHT);
-    u8g2.drawCircle(21,32,13, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
+    // u8g2.drawCircle(21,32,13, U8G2_DRAW_UPPER_RIGHT);
+    u8g2.drawDisc(21,32,13, U8G2_DRAW_UPPER_RIGHT);
+    // u8g2.drawCircle(21,32,13, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
+    u8g2.drawDisc(21,32,13, U8G2_DRAW_LOWER_LEFT );
 
     // this code gets eval(..)'ed in the background with an fake u8g2 instance mapped to the HTML5 Canvas above
 }

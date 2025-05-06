@@ -1,6 +1,6 @@
 <templates>
 
-    <div t-name="App" class="main">
+    <div t-name="App" class="main" t-attf-style="--preview-height: #{heights.preview}px;">
         <div id="navbar">
             <!-- <Parser/> -->
         </div>
@@ -14,6 +14,7 @@
                     <!-- <div id="device" t-attf-style="transform: scale(#{sim.scale});"></div> -->
                      <Device/>
                 </div> 
+                <div class="separator horizontal" t-on-mousedown="onSplitterMouseDown"/>
                 <Editor/>
             </div>
             <div id="sidebar">sd</div>

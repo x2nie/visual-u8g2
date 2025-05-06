@@ -12,7 +12,25 @@ export default class App extends Component {
     static template = "App"
 
     setup(){
+        this.heights = useState({navbar:48, preview:215})
         this.sim = useState(this.env.sim);
     }
    
+    onSplitterMouseDown() {
+        const resizer = ev => {
+          this.heights.preview = ev.clientY - this.heights.navbar;
+        };
+    
+        document.body.addEventListener("mousemove", resizer);
+        // for (let iframe of document.getElementsByTagName("iframe")) {
+        //     iframe.classList.add("disabled");
+        // }
+    
+        document.body.addEventListener("mouseup", () => {
+            document.body.removeEventListener("mousemove", resizer);
+            // for (let iframe of document.getElementsByTagName("iframe")) {
+            //     iframe.classList.remove("disabled");
+            // }
+        });
+      }
 }
