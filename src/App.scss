@@ -9,7 +9,7 @@ body, html {
     color: #c5c8c6;
     flex-direction: column;
     --navbar-height: 48px;
-    --lcd-area-height: 215px;
+    --preview-height: 215px;
 
     #navbar{
         height: 48px;
@@ -32,19 +32,20 @@ body, html {
         display: flex;
         flex-direction: column;
 
-        #canvas-container{
-            height: var(--lcd-area-height);
+        #preview{
+            height: var(--preview-height);
             flex-grow: 0;
             flex-shrink: 0;
             position: relative;
             overflow: auto;
+            --sim-scale: 3;
         }
         
         #source-code{
             flex-grow: 1;
             flex-shrink: 1;
             background: yellow;
-            height: calc(100vh - var(--navbar-height) - var(--lcd-area-height));
+            height: calc(100vh - var(--navbar-height) - var(--preview-height));
         }
     }
 
@@ -54,12 +55,26 @@ body, html {
     }
 }
 
-.lcd-canvas {
-    // border: 2px solid #225a94;
-    box-sizing: content-box;
-    image-rendering: pixelated;
-    //transform: scale(4);
+#device{
+    position: relative;
+    // width: 127px;
+    // height: 202px;
+    // background-image: url(skin/nokia-3210.png);
+    background-size: contain;
     transform-origin: top left;
+    // top: calc( 3 * -55px);
+    
+    #lcd {
+        position: relative;
+        // left:27px;
+        // top:64px;
+        // border: 2px solid #225a94;
+        box-sizing: content-box;
+        image-rendering: pixelated;
+        //transform: scale(4);
+        // transform: scaleX(0.84);
+        transform-origin: top left;
+    }
 }
 
 // Helper to accurate mouse

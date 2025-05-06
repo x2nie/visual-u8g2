@@ -14,7 +14,9 @@ layers here !
 <LayerBox/>
 </div>
 <div id="mid">
-<div id="canvas-container"></div>
+<div id="preview" t-attf-style="--sim-scale: #{sim.scale};">
+<div id="device" t-attf-style="transform: scale(#{sim.scale});"></div>
+</div> 
 <Editor/>
 </div>
 <div id="sidebar">sd</div>

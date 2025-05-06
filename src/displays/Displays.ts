@@ -55,6 +55,20 @@ export const oled256x64: Display = {
     }
 };
 
+export const nokia3210: Display = {
+    name: "Nokia 3210",
+    width: 84,
+    height: 48,
+    resetColor: 0,
+    colorMap: {
+        0: "transparent",
+        1: "#383838"
+    },
+    css: `#preview{background:silver;} 
+        #device{width: 127px;height: 202px; background-image: url(skin/nokia-3210.png); top: calc( var(--sim-scale) * -55px)} 
+        #lcd{left:27px;  top:64px;transform: scaleX(0.84);    background-blend-mode: overlay;}`
+};
+
 export const nokia5110: Display = {
     name: "Nokia 5110",
     width: 84,
@@ -132,7 +146,7 @@ export const sharpMemory400x240: Display = {
 };
 
 export const displays = [oled128x64, oled128x32, oled128x128, oled256x128, oled256x64,
-    nokia5110,
+    nokia3210,nokia5110,
     flexEpaper, epaper154, waveshareEpaper219,
     dotMatrix328,
     sharpMemory240x240, sharpMemory400x240];

@@ -53,12 +53,13 @@ export class Parser extends Component{
 
 Parser.template = xml`
     <button t-on-click="btnClick">Parse!</button>
-    <canvas t-portal="'#canvas-container'" t-ref="canvas" 
-        class="lcd-canvas"
+    <canvas t-portal="'#device'" t-ref="canvas" 
+        id="lcd"
         t-on-mousemove="canvasMouseMove"
         t-att-width="display.width" t-att-height="display.height"
-        t-attf-style="transform: scale(#{sim.scale});"
-    />
+        />
+    <style t-if="display.css" type="text/css" t-out="display.css"></style>
+        <!-- t-attf-style="transform: scale(#{sim.scale});" -->
     <!-- <div t-portal="'#canvas-container'" class="box" 
         t-attf-style="left: #{state.x}px; top: #{state.y}px; width:#{sim.scale}px; height:#{sim.scale}px;"/> -->
 `

@@ -1,5 +1,5 @@
 // EditorComponent.js
-import { Component, onMounted, useRef } from "@odoo/owl";
+import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
 import * as monaco from "monaco-editor";
 import './themes'
 import './lang_ino'
@@ -31,10 +31,11 @@ export class Editor extends Component {
   static template = "EditorComponent";
 
   setup() {
+    this.sim = useState(this.env.sim);
     this.editorRef = useRef("editorContainer");
 
-    onMounted(() => {
-      monaco.editor.create(this.editorRef.el, {
+    useEffect((el) => {
+      this.editor = monaco.editor.create(el, {
         // value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
         value: this.env.editor.content,
         // language: "cpp",
@@ -43,6 +44,14 @@ export class Editor extends Component {
         theme: "tomorrow-night",
         automaticLayout: true,
       });
-    });
+      this.editor.onDidChangeModelContent(
+        this.editorChange.bind(this)
+      )
+    }, 
+    () => [this.editorRef.el]);
+  }
+
+  editorChange(ev){
+    this.env.editor.content = this.editor.getValue()
   }
 }

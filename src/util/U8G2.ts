@@ -449,6 +449,7 @@ export class U8G2 {
         d[1] = parseInt(hexColor.slice(3, 3 + 2), 16);
         d[2] = parseInt(hexColor.slice(5, 5 + 2), 16);
         d[3] = 255;
+        d[3] = 128;
 
         this.ctx.putImageData(id, x, y);
     }

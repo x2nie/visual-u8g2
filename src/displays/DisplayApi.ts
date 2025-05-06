@@ -8,4 +8,5 @@ export interface Display {
     height: number;
     resetColor: number;
     colorMap: ColorMap;
+    css?:string;
 }

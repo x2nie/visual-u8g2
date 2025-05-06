@@ -31,6 +31,9 @@ export const _U8G2_EVAL = {
     drawCircle: function(x0, y0, rad, opt = U8G2_DRAW_ALL) {
         add('drawCircle', getLinenumber(), [x0, y0, rad, opt])
     },
+    drawEllipse: function(x0, y0, rx, ry, opt = U8G2_DRAW_ALL) {
+        add('drawEllipse', getLinenumber(), [x0, y0, rx, ry, opt])
+    },
     setFont: function(fontName) {
         add('setFont', getLinenumber(), [fontName])
     },
