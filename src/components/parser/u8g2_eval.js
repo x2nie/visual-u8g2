@@ -61,10 +61,10 @@ export function parse_ino(code){
 function getLinenumber() {
     const error = new Error()
     const stack = error.stack.replace(/Error[\n\s]*/,'').trim()
-    // console.log(stack)
+    console.log(stack)
     // const stackLine = stack.split('\n').pop(); // Ambil baris pemanggilan
     const stackLine = stack.split('\n')[2]; // Ambil baris pemanggilan
-    const lineNumber = stackLine.match(/>:(\d+):\d+/)[1]; // Ekstrak nomor baris
+    const lineNumber = stackLine.match(/>[eval ]*:(\d+):\d+/)[1]; // Ekstrak nomor baris
     return parseInt(lineNumber)
 }
 
