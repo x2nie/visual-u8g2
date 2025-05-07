@@ -28,9 +28,9 @@ void draw(const char *s) {
     // u8g2.drawCircle(10,20,13);
     u8g2.drawEllipse(17, 10, 10, 10);
     // u8g2.drawCircle(21,32,13, U8G2_DRAW_UPPER_RIGHT);
-    u8g2.drawDisc(21,32,13, U8G2_DRAW_UPPER_RIGHT);
+    u8g2.drawDisc(21, 32,  13, U8G2_DRAW_UPPER_RIGHT);
     // u8g2.drawCircle(21,32,13, U8G2_DRAW_LOWER_LEFT | U8G2_DRAW_LOWER_RIGHT);
-    u8g2.drawDisc(21,32,13, U8G2_DRAW_LOWER_LEFT );
+    u8g2.drawDisc( 21 ,  32  ,13 , U8G2_DRAW_LOWER_LEFT );
 
     // this code gets eval(..)'ed in the background with an fake u8g2 instance mapped to the HTML5 Canvas above
 }

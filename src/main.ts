@@ -16,6 +16,7 @@ whenReady(async function () {
     editor: reactive({
               content: cpp_content,
               editLine: ()=>{}, //changed later by Editor
+              getFunctionParameter: ()=>{}, //changed later by Editor
             }),
     sim: reactive({
           display: nokia3210,

@@ -12,9 +12,10 @@ const EVAL_CALLS = [];
  * @param {number} l Line Number
  * @param {Array} args Arguments passed to function
  */
-function add(f, l, args){
-    // console.log(`${f} dipanggil di baris ${l} dengan params: ${[...args]}`);
-    EVAL_CALLS.push({f, l, args})
+function add(f, lineCol, args){
+    const [l,c] = lineCol;
+    // console.log(`${f} dipanggil di baris #${l}:${c} dengan params: ${[...args]}`);
+    EVAL_CALLS.push({f, l, c, args})
 }
 
 export const _U8G2_EVAL = {
@@ -61,10 +62,10 @@ export function parse_ino(code){
 function getLinenumber() {
     const error = new Error()
     const stack = error.stack.replace(/Error[\n\s]*/,'').trim()
-    console.log(stack)
+    // console.log(stack)
     // const stackLine = stack.split('\n').pop(); // Ambil baris pemanggilan
     const stackLine = stack.split('\n')[2]; // Ambil baris pemanggilan
-    const lineNumber = stackLine.match(/>[eval ]*:(\d+):\d+/)[1]; // Ekstrak nomor baris
-    return parseInt(lineNumber)
+    const [_, lineNum, colNum] = stackLine.match(/>[eval ]*:(\d+):(\d+)/); // Ekstrak nomor baris
+    return [parseInt(lineNum), parseInt(colNum)]
 }
 
