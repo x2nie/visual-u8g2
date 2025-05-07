@@ -1,3 +1,10 @@
+/**
+ * Author: x2nie - Fathony L
+ * Date create: 2025-05-07
+ * Purpose: Drawing UI guide to visually edit LCD by mouse
+ * License: LGPL or Apache 2.0 or MPL 2.1 (Mozilla Public License)
+ */
+
 import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
 import { runCode, U8G2 } from "../../util/U8G2";
 import { layerAt } from "./layerFinder";
@@ -100,12 +107,14 @@ export default class GuiHelper extends Component{
             } 
             let match = param.match(/(.*[\w\)\]\n\s]+.*)(\s*[+-]\s*)(\d+(\.\d+)?)\s*$/m);
             if (match) {
-                const [_, fixed, operator, num] = match;
+                let [_, fixed, operator, num] = match;
                 const oldActual = oldArgs[i];  // received by func.call
-                const oldNum = parseInt(num);  // part of param, not standalone
-                const minus = operator.trim() == '-'
                 const delta = val - oldActual;
-                const newNum = oldNum + delta;
+                const minus = operator.trim() == '-'
+                const oldNum = parseInt(num) * (minus?-1:1);  // part of param, not standalone
+                let newNum = oldNum + delta;
+                operator = operator.replace(/[+-]/, newNum <0? '-': '+')
+                newNum = Math.abs(newNum)
 
                 return `${fixed}${operator}${newNum}`
             } 
