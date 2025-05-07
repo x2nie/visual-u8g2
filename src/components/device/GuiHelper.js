@@ -38,14 +38,14 @@ export default class GuiHelper extends Component{
         const resizer = ev => {
             const dx = ev.offsetX - cx;
             const dy = ev.offsetY - cy;
-            console.log(`distance: x:${dx} y:${dy}`)
+            // console.log(`distance: x:${dx} y:${dy}`)
             this.layer.bound.x = x +  dx;
             this.layer.bound.y = y +  dy;
             this.layer.args[0] = args[0] +  dx;
             this.layer.args[1] = args[1] +  dy;
             this.drawHelper()
         };
-        const resizerBind = resizer.bind(this)
+        // const resizerBind = resizer.bind(this)
     
         this.canvas.addEventListener("mousemove", resizer);
         // for (let iframe of document.getElementsByTagName("iframe")) {
@@ -73,7 +73,7 @@ export default class GuiHelper extends Component{
         const x = ev.offsetX;
         const y = ev.offsetY;
         this.layer = layerAt(x,y, this.sim.layers)
-        console.log(`x:${x} y:${y} layer:`)
+        // console.log(`x:${x} y:${y} layer:`)
         this.drawHelper()
     }
     canvasMouseOut(){
