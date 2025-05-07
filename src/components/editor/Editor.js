@@ -34,9 +34,9 @@ export class Editor extends Component {
     async editLine(tasks) {
         const model = this.editor.getModel();
         const edits = tasks.map(([lineNums, texts]) => {
-        const [firstLine,lastLine] = lineNums;
+        const [firstLine,firstCol,lastLine] = lineNums;
         return {
-            range: new monaco.Range(firstLine, 1, lastLine, model.getLineMaxColumn(lastLine)),
+            range: new monaco.Range(firstLine, firstCol, lastLine, model.getLineMaxColumn(lastLine)),
             text: texts.join('\n'),
             forceMoveMarkers: true
         }
@@ -45,16 +45,26 @@ export class Editor extends Component {
 
     }
 
-    getFunctionParameter(lineNo, colNo, argsCount){
+    getFunctionParameter(lineNo, colNo){
         const model = this.editor.getModel() 
-        let code = model.getLineContent(lineNo);
-        let result
-        while(true && lineNo < model.getLineCount()){
-            result = extractFunctionParams(code, colNo)
-            if(result.length==argsCount)
-                break;
-            code += model.getLineContent(++lineNo)
+        let line = model.getLineContent(lineNo);
+        line = line.slice(colNo-1);
+
+        let code = line
+        let end = line.indexOf(';')
+        while(end == -1){
+            line = model.getLineContent(++lineNo)
+            end = line.indexOf(';')
+            code += end >=0? line.slice(0, end) : line;
         }
+        let result = extractFunctionParams(code)
+        // let result
+        // while(true && lineNo < model.getLineCount()){
+        //     result = extractFunctionParams(code, colNo)
+        //     if(result.length==argsCount)
+        //         break;
+        //     code += model.getLineContent(++lineNo)
+        // }
         return result;
     }
 
@@ -63,7 +73,7 @@ export class Editor extends Component {
     }
 }
 
-function extractFunctionParams(code, startColumn) {
+function extractFunctionParams(code, startColumn=0) {
     const start = code.indexOf('(', startColumn);
     // const end = code.lastIndexOf(')');
     let end = code.indexOf(';', start);
@@ -81,17 +91,18 @@ function extractFunctionParams(code, startColumn) {
         const char = paramStr[i];
 
         if (char === ',' && parenDepth === 0) {
-        //   params.push(current.trim());
-        params.push(current);
-        current = '';
+            // params.push(current.trim());
+            params.push(current);
+            current = '';
         } else {
-        if (char === '(') parenDepth++;
-        else if (char === ')') parenDepth--;
-        current += char;
+            if (char === '(') 
+                parenDepth++;
+            else if (char === ')') 
+                parenDepth--;
+            current += char;
         }
     }
 
-  //   if (current.trim()) params.push(current.trim());
     if (current) params.push(current);
 
     return params;

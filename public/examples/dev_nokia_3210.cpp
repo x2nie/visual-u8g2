@@ -23,7 +23,7 @@ void draw(const char *s) {
     // for loop to print "Hi" 5 times
     for (int i = 0; i < 5; i++) {
         // u8g2.drawStr(1, 48+i*16,"Hi, this editor supports");
-        u8g2.drawLine(41+i*3,3, 41+i*3, 20);
+        u8g2.drawLine(41+i*3, 3, 41+i*3, 20);
     }
     // u8g2.drawCircle(10,20,13);
     u8g2.drawEllipse(17, 10, 10, 10);

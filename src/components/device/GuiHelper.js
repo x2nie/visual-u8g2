@@ -76,7 +76,7 @@ export default class GuiHelper extends Component{
      * @param {Arguments[]} old_args Function arguments
      */
     updateSourceCode(layer, oldArgs, parameter_strings){
-        const {f,l,args} = layer
+        const {f,l,c,args} = layer
         // let argStr = JSON.stringify(layer.args)
         // argStr = argStr.slice(1,argStr.length-1)
 
@@ -120,9 +120,10 @@ export default class GuiHelper extends Component{
         // debugger
         const argStr = newArgs.join(',')
 
-        let code = `    u8g2.${f}(${argStr});`
+        // let code = `    u8g2.${f}(${argStr});`
+        let code = `${f}(${argStr});`
         console.log(`update #${l}| ${code} ori:`,parameter_strings)
-        this.env.editor.editLine([ [[l, l],[code]] ])
+        this.env.editor.editLine([ [[l,c, l],[code]] ])
     }
 
     canvasMouseHover(ev){
