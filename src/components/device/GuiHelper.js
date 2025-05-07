@@ -4,7 +4,7 @@ import { layerAt } from "./layerFinder";
 
 export default class GuiHelper extends Component{
     setup(){
-        this.state = useState({x:0, y:0})
+        this.state = useState({dragging:false})
         this.canvasRef = useRef('helper')
         this.canvas = null;
         this.ctx = null;
@@ -26,7 +26,44 @@ export default class GuiHelper extends Component{
             () => [this.state.hoverLayer]
         )
     }
+
+    onMouseDown(ev) {
+        if(!this.layer)
+            return
+        this.state.dragging = true;
+        const {x,y,w,h} = this.layer.bound;
+        const args = [...this.layer.args];
+        const [cx,cy] = [ev.offsetX, ev.offsetY]
+
+        const resizer = ev => {
+            const dx = ev.offsetX - cx;
+            const dy = ev.offsetY - cy;
+            console.log(`distance: x:${dx} y:${dy}`)
+            this.layer.bound.x = x +  dx;
+            this.layer.bound.y = y +  dy;
+            this.layer.args[0] = args[0] +  dx;
+            this.layer.args[1] = args[1] +  dy;
+            this.drawHelper()
+        };
+        const resizerBind = resizer.bind(this)
+    
+        this.canvas.addEventListener("mousemove", resizer);
+        // for (let iframe of document.getElementsByTagName("iframe")) {
+        //     iframe.classList.add("disabled");
+        // }
+    
+        this.canvas.addEventListener("mouseup", () => {
+            this.state.dragging = false;
+            this.canvas.removeEventListener("mousemove", resizer);
+            // for (let iframe of document.getElementsByTagName("iframe")) {
+            //     iframe.classList.remove("disabled");
+            // }
+        });
+    }
+
     canvasMouseMove(ev){
+        if(this.state.dragging) 
+            return;
         const scale = this.sim.scale
         // const round = (n) => Math.floor(n)
         // console.log(`x:${round(ev.offsetX/scale)} y:${round(ev.offsetY / scale)}`)
@@ -70,6 +107,7 @@ export default class GuiHelper extends Component{
 GuiHelper.template = xml`
     <canvas t-ref="helper" 
         class="lcd "
+        t-on-mousedown="onMouseDown"
         t-on-mousemove="canvasMouseMove"
         t-on-mouseleave="canvasMouseOut"
         t-att-width="sim.display.width*sim.scale*sim.display.screenRatio[0]" t-att-height="sim.display.height*sim.scale*sim.display.screenRatio[1]"
