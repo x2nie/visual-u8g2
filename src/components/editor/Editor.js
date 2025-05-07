@@ -33,6 +33,7 @@ export class Editor extends Component {
   setup() {
     this.sim = useState(this.env.sim);
     this.editorRef = useRef("editorContainer");
+    this.env.editor.editLine = this.editLine.bind(this);
 
     useEffect((el) => {
       this.editor = monaco.editor.create(el, {
@@ -51,6 +52,19 @@ export class Editor extends Component {
     () => [this.editorRef.el]);
   }
 
+  async editLine(tasks) {
+    const model = this.editor.getModel();
+    const edits = tasks.map(([lineNums, texts]) => {
+      const [firstLine,lastLine] = lineNums;
+      return {
+        range: new monaco.Range(firstLine, 1, lastLine, model.getLineMaxColumn(lastLine)),
+        text: texts.join('\n'),
+        forceMoveMarkers: true
+      }
+    })
+    model.pushEditOperations([], edits, () => null);
+
+  }
   editorChange(ev){
     this.env.editor.content = this.editor.getValue()
   }

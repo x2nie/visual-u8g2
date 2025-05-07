@@ -15,6 +15,7 @@ whenReady(async function () {
   const env = {
     editor: reactive({
               content: cpp_content,
+              editLine: ()=>{}, //changed later by Editor
             }),
     sim: reactive({
           display: nokia3210,

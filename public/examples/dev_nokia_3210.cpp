@@ -6,10 +6,10 @@ void setup(void) {
 void draw(const char *s) {
     int b = 20;
     u8g2.setDrawColor(1);
-    u8g2.drawLine(0, 0, 83, 0);
-    u8g2.drawLine(83, 0, 83, 47);
-    u8g2.drawLine(0,47, 83,47);
-    u8g2.drawLine(0,0, 0, 47);
+    // u8g2.drawLine(0, 0, 83, 0);
+    // u8g2.drawLine(83, 0, 83, 47);
+    // u8g2.drawLine(0,47, 83,47);
+    // u8g2.drawLine(0,0, 0, 47);
     // u8g2.drawLine(b, b*2, b+3, b-5);
 
     u8g2.drawLine(20, 5, 5, 32);

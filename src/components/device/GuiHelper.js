@@ -1,10 +1,10 @@
 import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
-import { U8G2 } from "../../util/U8G2";
+import { runCode, U8G2 } from "../../util/U8G2";
 import { layerAt } from "./layerFinder";
 
 export default class GuiHelper extends Component{
     setup(){
-        this.state = useState({dragging:false})
+        this.state = useState({x:-1, y:-1, dragging:false})
         this.canvasRef = useRef('helper')
         this.canvas = null;
         this.ctx = null;
@@ -30,31 +30,40 @@ export default class GuiHelper extends Component{
     onMouseDown(ev) {
         if(!this.layer)
             return
+        const layer = this.layer
         this.state.dragging = true;
-        const {x,y,w,h} = this.layer.bound;
-        const args = [...this.layer.args];
+        const {x,y,w,h} = layer.bound;
+        const args = [...this.layer.args, 'a'];
         const [cx,cy] = [ev.offsetX, ev.offsetY]
 
         const resizer = ev => {
             const dx = ev.offsetX - cx;
             const dy = ev.offsetY - cy;
             // console.log(`distance: x:${dx} y:${dy}`)
-            this.layer.bound.x = x +  dx;
-            this.layer.bound.y = y +  dy;
-            this.layer.args[0] = args[0] +  dx;
-            this.layer.args[1] = args[1] +  dy;
+            const layer = this.layer
+            layer.bound.x = x +  dx;
+            layer.bound.y = y +  dy;
+            layer.args[0] = args[0] +  dx;
+            layer.args[1] = args[1] +  dy;
             this.drawHelper()
+
+            const {f,l} = layer
+            let argStr = JSON.stringify(layer.args)
+            argStr = argStr.slice(1,argStr.length-1)
+            let code = `    u8g2.${f}(${argStr});`
+            console.log(`updating line #${l} with:${code}`)
+            this.env.editor.editLine([ [[l, l],[code]] ])
         };
-        // const resizerBind = resizer.bind(this)
+        const resizerBind = resizer.bind(this)
     
-        this.canvas.addEventListener("mousemove", resizer);
+        this.canvas.addEventListener("mousemove", resizerBind);
         // for (let iframe of document.getElementsByTagName("iframe")) {
         //     iframe.classList.add("disabled");
         // }
     
         this.canvas.addEventListener("mouseup", () => {
             this.state.dragging = false;
-            this.canvas.removeEventListener("mousemove", resizer);
+            this.canvas.removeEventListener("mousemove", resizerBind);
             // for (let iframe of document.getElementsByTagName("iframe")) {
             //     iframe.classList.remove("disabled");
             // }
@@ -72,6 +81,7 @@ export default class GuiHelper extends Component{
         // console.log(`x:${ev.offsetX} y:${ev.offsetY}`)
         const x = ev.offsetX;
         const y = ev.offsetY;
+        if(x==this.state.x && y==this.state.y) return; //don't redraw too fast
         this.layer = layerAt(x,y, this.sim.layers)
         // console.log(`x:${x} y:${y} layer:`)
         this.drawHelper()
@@ -100,7 +110,22 @@ export default class GuiHelper extends Component{
             // ctx.rect(x, y, w, h);
             // ctx.strokeRect(x, y, w, h);
             ctx.strokeRect(x*s*hor, y*s*ver, w*s*hor, h*s*ver);
+            this.drawHintLayer()
         }
+    }
+    
+    drawHintLayer(){
+        const {f,args} = this.layer
+        let arg = JSON.stringify(args)
+        arg = arg.slice(1,arg.length-1)
+        let code = `u8g2.${f}(${arg});`
+        console.log('draw: ', code)
+        //set to white
+        // while(this.u8g2.display.colorMap.length < 4){
+            this.u8g2.display.colorMap[3] = '#ffffff'
+        // }
+        runCode(this.u8g2, 'u8g2.setDrawColor(3);' )
+        runCode(this.u8g2, code )
     }
 }
 

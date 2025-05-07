@@ -17,6 +17,7 @@ export default class Device extends Component {
         this.canvas = null;
         this.ctx = null;
         this.sim = useState(this.env.sim);
+        this.editor = useState(this.env.editor);
         this.layer = null; // layer on mouse move
 
         useEffect(
@@ -27,6 +28,13 @@ export default class Device extends Component {
                 this.renderLcd()
             },
             ()=>[this.canvasRef.el]
+        )
+
+        useEffect(
+            ()=>{
+                this.renderLcd()
+            },
+            ()=>[this.editor.content]
         )
 
         onMounted(()=>{
@@ -41,7 +49,7 @@ export default class Device extends Component {
     }
 
     renderLcd(){
-        let code = this.env.editor.content;
+        let code = this.editor.content;
         code = transpile(code)
         // console.log(code)
 
@@ -53,6 +61,8 @@ export default class Device extends Component {
 
         // const {u8g2} = this;
         // eval(code + CALL_LOOP)
+        // runCode(this.u8g2, 'u8g2.clear()')
+        this.u8g2._reset()
         runCode(this.u8g2, code + CALL_LOOP)
     }
     /*

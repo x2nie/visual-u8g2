@@ -65,6 +65,6 @@ function getLinenumber() {
     // const stackLine = stack.split('\n').pop(); // Ambil baris pemanggilan
     const stackLine = stack.split('\n')[2]; // Ambil baris pemanggilan
     const lineNumber = stackLine.match(/>:(\d+):\d+/)[1]; // Ekstrak nomor baris
-    return lineNumber
+    return parseInt(lineNumber)
 }
 

@@ -29,7 +29,13 @@ export class U8G2 {
         this.ctx.imageSmoothingEnabled = false;
         ctx.fillStyle = display.colorMap[display.resetColor];
         ctx.fillRect(0, 0, display.width, display.height);
-
+    }
+    _reset(){
+        // let t = this.drawColor;
+        // this.setDrawColor(this.display.resetColor);
+        this.ctx.fillStyle = this.display.colorMap[this.display.resetColor];
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // this.setDrawColor(t);
     }
 
     getDisplay() {
@@ -449,7 +455,7 @@ export class U8G2 {
         d[1] = parseInt(hexColor.slice(3, 3 + 2), 16);
         d[2] = parseInt(hexColor.slice(5, 5 + 2), 16);
         d[3] = 255;
-        d[3] = 128;
+        //d[3] = 128;
 
         this.ctx.putImageData(id, x, y);
     }
