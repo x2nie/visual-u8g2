@@ -81,11 +81,11 @@ export default class GuiHelper extends Component{
         // argStr = argStr.slice(1,argStr.length-1)
 
         const newArgs = args.map((val,i)=>{
-            // Jika literal angka
             let param = parameter_strings[i] || undefined
             if(param===undefined){
                 return String(val)
             }
+            //? Jika literal angka
             if (/^\s*[+-]?\d+(\.\d+)?\s*$/.test(param)) {
                 const oldVal = parseInt(param);
                 return param.replace(String(oldVal), String(val))
@@ -97,8 +97,24 @@ export default class GuiHelper extends Component{
                 if(val & 0x04) corners.push('U8G2_DRAW_LOWER_LEFT');
                 if(val & 0x08) corners.push('U8G2_DRAW_LOWER_RIGHT');
                 return ' '+ corners.join(' | ')
-            } else {
-                return String(val)
+            } 
+            let match = param.match(/(.*[\w\)\]\n\s]+.*)(\s*[+-]\s*)(\d+(\.\d+)?)\s*$/m);
+            if (match) {
+                const [_, fixed, operator, num] = match;
+                const oldActual = oldArgs[i];  // received by func.call
+                const oldNum = parseInt(num);  // part of param, not standalone
+                const minus = operator.trim() == '-'
+                const delta = val - oldActual;
+                const newNum = oldNum + delta;
+
+                return `${fixed}${operator}${newNum}`
+            } 
+            else {
+                const oldActual = oldArgs[i];  // received by func.call
+                const delta = val - oldActual;
+                const operator = delta < 0? ' - ': ' + ';
+                const newNum = Math.abs(delta)
+                return `${param}${operator}${newNum}`
             }
         })
         // debugger
