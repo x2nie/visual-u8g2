@@ -59,6 +59,7 @@ export const nokia3210: Display = {
     name: "Nokia 3210",
     width: 84,
     height: 48,
+    screenRatio: [0.84, 1],
     resetColor: 0,
     colorMap: {
         0: "transparent",

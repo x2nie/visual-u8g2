@@ -3,10 +3,12 @@ import { runCode, U8G2 } from "../../util/U8G2";
 import { transpile } from "../../util/cpp2javascript";
 import { parse_ino } from "../parser/u8g2_eval";
 import { layerAt } from "./layerFinder";
+import GuiHelper from "./GuiHelper";
 
 const CALL_LOOP = '; try{ setup(); loop(); } catch(err) {console.log("error-evaluate-loop:"+err.message);}'
 
 export default class Device extends Component {
+    static components = {GuiHelper}
     setup(){
         this.state = useState({x:0, y:0})
         this.deviceRef = useRef('device')
@@ -25,11 +27,6 @@ export default class Device extends Component {
                 this.renderLcd()
             },
             ()=>[this.canvasRef.el]
-        )
-
-        useEffect(
-            (layer) =>{},
-            () => [this.state.hoverLayer]
         )
 
         onMounted(()=>{
@@ -58,8 +55,9 @@ export default class Device extends Component {
         // eval(code + CALL_LOOP)
         runCode(this.u8g2, code + CALL_LOOP)
     }
-    
+    /*
     canvasMouseMove(ev){
+        return
         const scale = this.sim.scale
         // const round = (n) => Math.floor(n)
         // console.log(`x:${round(ev.offsetX/scale)} y:${round(ev.offsetY / scale)}`)
@@ -85,7 +83,8 @@ export default class Device extends Component {
         if(layer){
             // ctx.fillStyle = 'white';
             ctx.lineWidth = 2;
-            ctx.setLineDash([3, 5]);
+            ctx.lineWidth = 1;
+            // ctx.setLineDash([3, 5]);
             ctx.strokeStyle = 'white';
             
             const {x,y,w,h} = layer.bound;
@@ -96,6 +95,7 @@ export default class Device extends Component {
             ctx.strokeRect(x*s, y*s, w*s, h*s);
         }
     }
+    */
 }
 
 
@@ -108,10 +108,11 @@ Device.template = xml`
             t-on-mouseleave="canvasMouseOut"
             t-att-width="display.width" t-att-height="display.height"
             />
-        <canvas t-ref="helper" 
+        <!-- <canvas t-ref="helper" 
             class="lcd no-mouse"
             t-att-width="display.width*sim.scale" t-att-height="display.height*sim.scale"
             t-attf-style="width:#{display.width}px; height:#{display.height}px;"
-            />
+            /> -->
+        <GuiHelper/>
     </div>
 `

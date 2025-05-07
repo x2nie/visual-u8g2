@@ -4,8 +4,12 @@ export type ColorMap = {
 
 export interface Display {
     name: string;
-    width: number;
+    width: number;  // actual pixel available
     height: number;
+    screenRatio?: [ // visual stretech
+        number, // horizontal
+        number  // vertical
+    ]
     resetColor: number;
     colorMap: ColorMap;
     css?:string;
