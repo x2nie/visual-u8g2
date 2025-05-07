@@ -89,6 +89,14 @@ export default class GuiHelper extends Component{
             if (/^\s*[+-]?\d+(\.\d+)?\s*$/.test(param)) {
                 const oldVal = parseInt(param);
                 return param.replace(String(oldVal), String(val))
+            } 
+            else if (/U8G2_DRAW_/.test(param)) {
+                const corners = []
+                if(val & 0x01) corners.push('U8G2_DRAW_UPPER_RIGHT');
+                if(val & 0x02) corners.push('U8G2_DRAW_UPPER_LEFT');
+                if(val & 0x04) corners.push('U8G2_DRAW_LOWER_LEFT');
+                if(val & 0x08) corners.push('U8G2_DRAW_LOWER_RIGHT');
+                return ' '+ corners.join(' | ')
             } else {
                 return String(val)
             }

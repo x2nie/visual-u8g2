@@ -29,14 +29,14 @@ export const _U8G2_EVAL = {
         add('drawStr', getLinenumber(), args)
     },
 
-    drawCircle: function(x0, y0, rad, opt = U8G2_DRAW_ALL) {
-        add('drawCircle', getLinenumber(), [x0, y0, rad, opt])
+    drawCircle: function(x0, y0, rad, ...opt) {
+        add('drawCircle', getLinenumber(), [x0, y0, rad, ...opt])
     },
-    drawDisc: function(x0, y0, rad, opt = U8G2_DRAW_ALL) {
-        add('drawDisc', getLinenumber(), [x0, y0, rad, opt])
+    drawDisc: function(x0, y0, rad, ...opt) {
+        add('drawDisc', getLinenumber(), [x0, y0, rad, ...opt])
     },
-    drawEllipse: function(x0, y0, rx, ry, opt = U8G2_DRAW_ALL) {
-        add('drawEllipse', getLinenumber(), [x0, y0, rx, ry, opt])
+    drawEllipse: function(x0, y0, rx, ry, ...opt) {
+        add('drawEllipse', getLinenumber(), [x0, y0, rx, ry, ...opt])
     },
     setFont: function(fontName) {
         add('setFont', getLinenumber(), [fontName])
