@@ -68,3 +68,54 @@ import * as monaco from 'monaco-editor';
     }
   });
 // }
+
+// 1. Load your function metadata
+const u8g2Functions = [
+  {
+    name: "drawLine",
+    signature: "drawLine(int x0, int y0, int x1, int y1)",
+    parameters: ["int x0", "int y0", "int x1", "int y1"]
+  },
+  {
+    name: "drawStr",
+    signature: "drawStr(int x, int y, const char* str)",
+    parameters: ["int x", "int y", "const char* str"]
+  },
+  {
+    name: "drawBox",
+    signature: "drawBox(int x, int y, int w, int h)",
+    parameters: ["int x", "int y", "int w", "int h"]
+  }
+];
+
+// 2. Register signature help provider
+monaco.languages.registerSignatureHelpProvider('ino', {
+  signatureHelpTriggerCharacters: ['(', ','],
+  provideSignatureHelp(model, position) {
+    const wordUntil = model.getWordUntilPosition(position);
+    const wordRange = new monaco.Range(position.lineNumber, wordUntil.startColumn, position.lineNumber, wordUntil.endColumn);
+    const lineContent = model.getLineContent(position.lineNumber).substring(0, position.column - 1);
+
+    // Try to detect function being typed
+    const funcNameMatch = /([a-zA-Z_][a-zA-Z0-9_]*)\s*\([^()]*$/.exec(lineContent);
+    if (!funcNameMatch) return { value: null, dispose: () => {} };
+
+    const funcName = funcNameMatch[1];
+    const func = u8g2Functions.find(f => f.name === funcName);
+    if (!func) return { value: null, dispose: () => {} };
+
+    const paramIndex = (lineContent.match(/,/g) || []).length;
+
+    return {
+      value: {
+        activeSignature: 0,
+        activeParameter: paramIndex,
+        signatures: [{
+          label: func.signature,
+          parameters: func.parameters.map(p => ({ label: p }))
+        }]
+      },
+      dispose: () => {}
+    };
+  }
+});
