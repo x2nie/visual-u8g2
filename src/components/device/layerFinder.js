@@ -1,14 +1,23 @@
+import { LayerFactory } from "../layers/Layer";
+
 export function layerAt(x,y, layers){
-    layers.forEach(assureBound);
+    // layers.forEach(assureBound);
     return layers.toReversed().find(layer => {
+        assureBound(layer)
         const box = layer.bound
-        return (x >= box.x && x <= box.x + box.w &&
-            y >= box.y && y <= box.y + box.h) 
+        return (
+            x >= box.x && 
+            x <= box.x + box.w +1 &&
+            y >= box.y && 
+            y <= box.y + box.h + 1
+        ) 
     })
 }
 
 function assureBound(layer){
     if(layer.bound) return;
+    LayerFactory.from(layer).updateBound()
+    /*return
     let x,y,r,rx,ry,x2,y2;
     switch (layer.f) {
         case 'drawEllipse':
@@ -31,6 +40,6 @@ function assureBound(layer){
     
         default:
             break;
-    }
+    }*/
     // console.log(layer.f, layer.bound)
 }

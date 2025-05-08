@@ -8,6 +8,7 @@
 import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
 import { runCode, U8G2 } from "../../util/U8G2";
 import { layerAt } from "./layerFinder";
+import { LayerFactory, mouseInHandle } from "../layers/Layer";
 
 export default class GuiHelper extends Component{
     setup(){
@@ -37,8 +38,14 @@ export default class GuiHelper extends Component{
     onMouseDown(ev) {
         if(!this.layer)
             return
+        const [cx,cy] = [ev.offsetX, ev.offsetY]
         const layer = this.layer
         this.state.dragging = true;
+        const obj = LayerFactory.from(layer)
+        const handles = obj.getHandles();
+        let handleIndex = handles.findIndex(h => mouseInHandle(cx,cy, h))
+        if(handleIndex==-1) handleIndex = 0
+        const handle = handles[handleIndex]
 
         const logical_parameters = this.env.editor.getFunctionParameter(layer.l, layer.c)
         console.log('original:', logical_parameters)
@@ -46,10 +53,9 @@ export default class GuiHelper extends Component{
         //? save state, so "layer" becoming persistent during dragging until mouse-up
         const {x,y,w,h} = layer.bound;
         const args = [...this.layer.args];  //actual value passed to u8g2.function()
-        const [cx,cy] = [ev.offsetX, ev.offsetY]
         let [laxtx,lasty] = [cx,cy]
 
-        const resizer = ev => {
+        const mouseMoved = ev => {
             if(ev.offsetX==laxtx && ev.offsetY==lasty) return; //? dont redraw too fast
             laxtx = ev.offsetX;
             lasty = ev.offsetY;
@@ -58,10 +64,11 @@ export default class GuiHelper extends Component{
             const dy = ev.offsetY - cy;
             // console.log(`distance: x:${dx} y:${dy}`)
             const layer = this.layer
-            layer.bound.x = x +  dx;
-            layer.bound.y = y +  dy;
-            layer.args[0] = args[0] +  dx;
-            layer.args[1] = args[1] +  dy;
+            // layer.bound.x = x +  dx;
+            // layer.bound.y = y +  dy;
+            // layer.args[0] = args[0] +  dx;
+            // layer.args[1] = args[1] +  dy;
+            obj.moveHandle(handleIndex, handle.x+dx, handle.y+dy)
             this.drawHelper()
 
             this.updateSourceCode(layer, args, logical_parameters)
@@ -69,11 +76,11 @@ export default class GuiHelper extends Component{
         };
         // const resizerBind = resizer.bind(this)
     
-        this.canvas.addEventListener("mousemove", resizer);
+        this.canvas.addEventListener("mousemove", mouseMoved);
     
         this.canvas.addEventListener("mouseup", () => {
             this.state.dragging = false;
-            this.canvas.removeEventListener("mousemove", resizer);
+            this.canvas.removeEventListener("mousemove", mouseMoved);
         });
     }
 
@@ -131,7 +138,8 @@ export default class GuiHelper extends Component{
 
         // let code = `    u8g2.${f}(${argStr});`
         let code = `${f}(${argStr});`
-        console.log(`update #${l}| ${code} ori:`,parameter_strings)
+        // console.log(`update #${l}| ${code} ori:`,parameter_strings)
+        // console.log(`update #${l}| ${code}`)
         this.env.editor.editLine([ [[l,c, l],[code]] ])
     }
 
@@ -150,7 +158,13 @@ export default class GuiHelper extends Component{
         this.state.x = x;
         this.state.y = y;
 
-        this.layer = layerAt(x,y, this.sim.layers)
+        const layer = layerAt(x,y, this.sim.layers)
+        if(layer==this.layer) 
+            return; // no ui update is needed
+
+        this.layer=layer;
+        // debugger
+        //this.obj = LayerFactory.from(layer)
         // console.log(`x:${x} y:${y} layer:`)
         this.drawHelper()
     }
@@ -168,15 +182,53 @@ export default class GuiHelper extends Component{
 
         const layer = this.layer;
         if(layer){
+            const s = this.sim.scale
+            const [hor,ver] = this.sim.display.screenRatio;
+            const obj = LayerFactory.from(layer)
+            const handles = obj.getHandles()
+            ctx.fillStyle = 'lime';
+            handles.forEach(({x,y, type}) =>{
+                switch (type) {
+                    case 'centroid':
+                    case 'start':
+                        ctx.beginPath()
+                        ctx.fillStyle = type=='centroid'?'aqua':'lime';
+                        ctx.rect((x)*s*hor, (y)*s*ver, s*hor, s*ver)
+                        ctx.fill();
+                        break;
+                    case 'end':
+                        ctx.beginPath()
+                        ctx.fillStyle = 'red';
+                        ctx.rect((x)*s*hor, (y)*s*ver, s*hor, s*ver)
+                        ctx.fill();
+                        break;
+                    case 'radius':
+                        ctx.beginPath()
+                        ctx.fillStyle = 'fuchsia';
+                        ctx.rect((x)*s*hor, (y)*s*ver, s*hor, s*ver)
+                        ctx.fill();
+                        break;
+                    case 'whole':
+                        break
+                
+                    default:
+                        ctx.beginPath()
+                        ctx.ellipse((0.5+x)*s*hor, (0.5+y)*s*ver, 10, 10, 0, 0, 2 * Math.PI);
+                        ctx.fill();
+                        break;
+                    }
+            })
+            // ctx.fill();
+
             // ctx.fillStyle = 'white';
             ctx.lineWidth = 2;
             ctx.lineWidth = 1;
             // ctx.setLineDash([3, 5]);
             ctx.strokeStyle = 'white';
             
-            const {x,y,w,h} = layer.bound;
-            const s = this.sim.scale
-            const [hor,ver] = this.sim.display.screenRatio;
+            let {x,y,w,h} = layer.bound;
+            w++;
+            h++;
             // console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
             // ctx.rect(x, y, w, h);
             // ctx.strokeRect(x, y, w, h);

@@ -23,7 +23,7 @@ type StrCall = {
 
 type CircleCall = {
     f: 'drawCircle' | 'drawDisc';
-    args: [number, number, number]; // x, y, radius
+    args: [number, number, number, number]; // x, y, radius, opt
     } & CallCommon;
 
 // type DiscCall = {
@@ -67,6 +67,19 @@ export type LayerCall =
     | TriangleCall
     | FrameCall;
 
+export type Handle = {
+    x: number;
+    y: number;
+    type?: 'centroid' | 'start' | 'end' | 'radius' | 'whole';
+}
+
+export function mouseInHandle(x2:number,y2:number, h:Handle){
+    const {x,y} = h;
+    const dx = x2 - x;
+    const dy = y2 - y;
+    const delta = dx * dx + dy * dy;
+    return delta < 4; // karena 2² = 4
+}
 
 class Line {
     constructor(public data: LineCall) {}
@@ -81,14 +94,38 @@ class Line {
         this.data.args[2] += dx;
         this.data.args[3] += dy;
     }
-    getHandles(): { x: number; y: number }[] {
+    getHandles(): Handle[] {
         const [x, y, x2, y2] = this.data.args;
         return [
-        { x, y },           // Pusat
-        { x: x2, y: y2 }     // Titik pada radius
+        { x, y, type:'whole' },          
+        { x, y, type:'start' },          
+        { x: x2, y: y2, type:'end' }     
         ];
     }
-
+    moveHandle(index: number, x: number, y: number) {
+        const [a, b, c, d] = this.data.args;
+        switch (index) {
+            case 0:
+                const [w,h] = [c - a, d -b];
+                this.data.args = [x, y, x+w, y+h];
+                break;
+            case 1:
+                this.data.args = [x, y, c, d];
+                break;
+            case 2:
+                this.data.args = [a, b, x, y]
+                break;
+        }
+        this.updateBound()
+    }
+    updateBound() {
+        const [x1, y1, x2, y2] = this.data.args;
+        const x = Math.min(x1, x2);
+        const y = Math.min(y1, y2);
+        const w = Math.abs(x2 - x1);
+        const h = Math.abs(y2 - y1);
+        this.data.bound = { x, y, w, h };
+    }
     toString(): string {
         const [x0, y0, x1, y1] = this.data.args;
         return `Line from (${x0}, ${y0}) to (${x1}, ${y1})`;
@@ -113,6 +150,13 @@ class Str {
         ];
     }
 
+    updateBound() {
+        const [x, y, text] = this.data.args;
+        const w = text.length * 6; // asumsi 6px per karakter
+        const h = 8;               // asumsi tinggi font 8px
+        this.data.bound = { x, y: y - h, w, h };
+    }
+
     toString(): string {
         const [x, y, text] = this.data.args;
         return `Text "${text}" at (${x}, ${y})`;
@@ -126,25 +170,30 @@ class Circle {
         return new Circle(data);
     }
 
-    getHandles(): { x: number; y: number }[] {
+    getHandles(): Handle[] {
         const [x, y, r] = this.data.args;
         return [
-            { x, y },           // Pusat
-            { x: x + r, y }     // Titik pada radius
+            { x, y, type:'centroid' },           // Pusat
+            { x: x + r, y, type:'radius' }     // Titik pada radius
         ];
     }
 
     moveHandle(index: number, x: number, y: number) {
+        const [cx, cy, r, opt] = this.data.args;
         switch (index) {
             case 0:
-                const [_, __, r0] = this.data.args;
-                this.data.args = [x, y, r0];
+                this.data.args = [x, y, r, opt];
                 break;
             case 1:
-                const [cx, cy, _r] = this.data.args;
                 this.data.args[2] = x - cx;
                 break;
         }
+        this.updateBound()
+    }
+
+    updateBound() {
+        const [x, y, r] = this.data.args;
+        this.data.bound = { x: x - r, y: y - r, w: r * 2, h: r * 2 };
     }
 }
   
@@ -161,12 +210,12 @@ class Ellipse {
         return new Ellipse(data);
     }
 
-    getHandles(): { x: number; y: number }[] {
+    getHandles(): Handle[] {
         const [x, y, rx, ry] = this.data.args;
         return [
-        { x, y },               // Pusat
-        { x: x + rx, y },       // Titik pada radius x
-        { x, y: y + ry }        // Titik pada radius y
+        { x, y, type:'centroid' },               // Pusat
+        { x: x + rx, y, type:'radius' },       // Titik pada radius x
+        { x, y: y + ry, type:'radius' }        // Titik pada radius y
         ];
     }
 
@@ -183,6 +232,12 @@ class Ellipse {
                 this.data.args[3] = y - cy;
                 break;
         }
+        this.updateBound()
+    }
+
+    updateBound() {
+        const [x, y, rx, ry] = this.data.args;
+        this.data.bound = { x: x - rx, y: y - ry, w: rx * 2, h: ry * 2 };
     }
 }
 
@@ -257,6 +312,16 @@ class Triangle {
         if (index < 0 || index > 2) return;
         this.data.args[index * 2] = x;
         this.data.args[index * 2 + 1] = y;
+        this.updateBound()
+    }
+
+    updateBound() {
+        const [x0, y0, x1, y1, x2, y2] = this.data.args;
+        const x = Math.min(x0, x1, x2);
+        const y = Math.min(y0, y1, y2);
+        const w = Math.max(x0, x1, x2) - x;
+        const h = Math.max(y0, y1, y2) - y;
+        this.data.bound = { x, y, w, h };
     }
 }
   
@@ -293,6 +358,12 @@ class Frame {
             this.data.args = [x, oy, ox + ow - x, y - oy];
             break;
         }
+        this.updateBound()
+    }
+
+    updateBound() {
+        const [x, y, w, h] = this.data.args;
+        this.data.bound = { x, y, w, h };
     }
 }
 
@@ -355,7 +426,7 @@ export class LayerFactory {
     //* 🎉 Data mentah telah berubah karena referensinya sama!
 */
   
-  
+/*  
 export interface Layer {
     // Function name
     f: | 'drawLine' | 'drawCircle' | 'drawDisc' | 'drawEllipse' | 'drawFilledEllipse';
@@ -376,4 +447,4 @@ export interface Layer {
         w:number,
         h:number
     }
-}
+}*/
