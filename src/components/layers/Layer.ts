@@ -1,3 +1,10 @@
+/**
+ * Author: x2nie - Fathony L
+ * Date create: 2025-05-08
+ * Purpose: Interim class to simplify modifying layer visually.
+ * License: LGPL or Apache 2.0 or MPL 2.1 (Mozilla Public License)
+ */
+
 type CallCommon = {
     lineNo: number;
     columnNo: number;
@@ -39,7 +46,26 @@ type ArcCall = {
     args: [number, number, number, number, number]; // x, y, radius, startAngle, endAngle
     } & CallCommon;
 
-type LayerCall = LineCall | StrCall | CircleCall | /* DiscCall | */ EllipseCall | /* FilledEllipseCall | */ ArcCall;
+type TriangleCall = {
+    f: 'drawTriangle';
+    args: [number, number, number, number, number, number]; // x0, y0, x1, y1, x2, y2
+    } & CallCommon;
+
+type FrameCall = {
+    f: 'drawFrame' | 'drawBox';
+    args: [number, number, number, number]; // x, y, w, h
+    } & CallCommon;
+      
+export type LayerCall =
+    | LineCall
+    | StrCall
+    | CircleCall
+    // | DiscCall
+    | EllipseCall
+    // | FilledEllipseCall
+    | ArcCall
+    | TriangleCall
+    | FrameCall;
 
 
 class Line {
@@ -211,26 +237,97 @@ class Arc {
     }
 }
   
-  
-type LayerWrapper = Line | Str | Circle | Disc | Ellipse | FilledEllipse | Arc;
+class Triangle {
+    constructor(public data: TriangleCall) {}
 
-class LayerFactory {
+    static from(data: TriangleCall): Triangle {
+        return new Triangle(data);
+    }
+
+    getHandle(): { x: number; y: number }[] {
+        const [x0, y0, x1, y1, x2, y2] = this.data.args;
+        return [
+        { x: x0, y: y0 },
+        { x: x1, y: y1 },
+        { x: x2, y: y2 }
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        if (index < 0 || index > 2) return;
+        this.data.args[index * 2] = x;
+        this.data.args[index * 2 + 1] = y;
+    }
+}
+  
+class Frame {
+    constructor(public data: FrameCall) {}
+
+    static from(data: FrameCall): Frame {
+        return new Frame(data);
+    }
+
+    getHandle(): { x: number; y: number }[] {
+        const [x, y, w, h] = this.data.args;
+        return [
+            { x, y },           // Top-left
+            { x: x + w, y },    // Top-right
+            { x: x + w, y: y + h }, // Bottom-right
+            { x, y: y + h }     // Bottom-left
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        const [ox, oy, ow, oh] = this.data.args;
+        switch (index) {
+        case 0: // top-left
+            this.data.args = [x, y, ox + ow - x, oy + oh - y];
+            break;
+        case 1: // top-right
+            this.data.args = [ox, y, x - ox, oy + oh - y];
+            break;
+        case 2: // bottom-right
+            this.data.args = [ox, oy, x - ox, y - oy];
+            break;
+        case 3: // bottom-left
+            this.data.args = [x, oy, ox + ow - x, y - oy];
+            break;
+        }
+    }
+}
+
+class Box extends Frame {
+    static from(data: FrameCall): Box {
+        return new Box(data);
+    }
+}
+  
+  
+export type LayerWrapper =
+    | Line
+    | Str
+    | Circle
+    | Disc
+    | Ellipse
+    | FilledEllipse
+    | Arc
+    | Triangle
+    | Frame
+    | Box;
+
+export class LayerFactory {
     static from(data: LayerCall): LayerWrapper {
         switch (data.f) {
-        case 'drawLine':
-            return Line.from(data);
-        case 'drawStr':
-            return Str.from(data);
-        case 'drawCircle':
-            return Circle.from(data);
-        case 'drawDisc':
-            return Disc.from(data);
-        case 'drawEllipse':
-            return Ellipse.from(data);
-        case 'drawFilledEllipse':
-            return FilledEllipse.from(data);
-        case 'drawArc':
-            return Arc.from(data);
+            case 'drawLine': return Line.from(data);
+            case 'drawStr': return Str.from(data);
+            case 'drawCircle': return Circle.from(data);
+            case 'drawDisc': return Disc.from(data);
+            case 'drawEllipse': return Ellipse.from(data);
+            case 'drawFilledEllipse': return FilledEllipse.from(data);
+            case 'drawArc': return Arc.from(data);
+            case 'drawTriangle': return Triangle.from(data);
+            case 'drawFrame': return Frame.from(data);
+            case 'drawBox': return Box.from(data);
         default:
             throw new Error(`Unknown draw type: ${(data as any).f}`);
         }
