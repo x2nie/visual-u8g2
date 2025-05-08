@@ -1,8 +1,10 @@
 // EditorComponent.js
 import { Component, onMounted, useEffect, useRef, useState } from "@odoo/owl";
 import * as monaco from "monaco-editor";
+import * as esprima from 'esprima';
 import './themes'
 import './lang_ino'
+import { transpile } from "../../util/cpp2javascript";
 
 
 export class Editor extends Component {
@@ -69,7 +71,41 @@ export class Editor extends Component {
     }
 
     editorChange(ev){
-        this.env.editor.content = this.editor.getValue()
+        // this.env.editor.content = this.editor.getValue()
+        // return
+        const model = this.editor.getModel() 
+        let code = model.getValue();
+        code = transpile(code)
+        const error = checkSyntax(code);
+        if (error) {
+            console.log(error)
+            monaco.editor.setModelMarkers(model, 'owner', [{
+                startLineNumber: error.line,
+                startColumn: error.column,
+                endLineNumber: error.line,
+                endColumn: error.column + 1,
+                message: error.message,
+                severity: monaco.MarkerSeverity.Error
+            }]);
+        } else {
+            // clear markers
+            monaco.editor.removeAllMarkers('owner');
+            this.env.editor.content = this.editor.getValue()
+        }
+    }
+}
+
+function checkSyntax(code) {
+    try {
+      esprima.parseScript(code, { tolerant: false, loc: true });
+      return null; // tidak ada error
+    } catch (e) {
+        // console.log(e);
+        return {
+            message: e.message,
+            line: e.lineNumber,
+            column: e.column
+        };
     }
 }
 

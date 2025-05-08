@@ -22,6 +22,7 @@
     "dependencies": {
         "@odoo/owl": "2.2.10",
         "bdf-canvas": "^1.0.1",
+        "esprima": "^4.0.1",
         "font-awesome": "^4.7.0",
         "hsl-to-hex": "^1.0.0",
         "monaco-editor": "^0.52.2"
