@@ -14,7 +14,32 @@ type StrCall = {
     args: [number, number, string];
     } & CallCommon;
 
-type LayerCall = LineCall | StrCall;
+type CircleCall = {
+    f: 'drawCircle' | 'drawDisc';
+    args: [number, number, number]; // x, y, radius
+    } & CallCommon;
+
+// type DiscCall = {
+//     f: 'drawDisc';
+//     args: [number, number, number]; // x, y, radius
+//     } & CallCommon;
+
+type EllipseCall = {
+    f: 'drawEllipse'|'drawFilledEllipse';
+    args: [number, number, number, number]; // x, y, rx, ry
+    } & CallCommon;
+
+// type FilledEllipseCall = {
+//     f: 'drawFilledEllipse';
+//     args: [number, number, number, number]; // x, y, rx, ry
+//     } & CallCommon;
+
+type ArcCall = {
+    f: 'drawArc';
+    args: [number, number, number, number, number]; // x, y, radius, startAngle, endAngle
+    } & CallCommon;
+
+type LayerCall = LineCall | StrCall | CircleCall | /* DiscCall | */ EllipseCall | /* FilledEllipseCall | */ ArcCall;
 
 
 class Line {
@@ -29,6 +54,13 @@ class Line {
         this.data.args[1] += dy;
         this.data.args[2] += dx;
         this.data.args[3] += dy;
+    }
+    getHandles(): { x: number; y: number }[] {
+        const [x, y, x2, y2] = this.data.args;
+        return [
+        { x, y },           // Pusat
+        { x: x2, y: y2 }     // Titik pada radius
+        ];
     }
 
     toString(): string {
@@ -48,6 +80,12 @@ class Str {
         this.data.args[0] += dx;
         this.data.args[1] += dy;
     }
+    getHandles(): { x: number; y: number }[] {
+        const [x, y] = this.data.args;
+        return [
+        { x, y },           // baseline
+        ];
+    }
 
     toString(): string {
         const [x, y, text] = this.data.args;
@@ -55,18 +93,150 @@ class Str {
     }
 }
   
-class CallFactory {
-    static from(data: LayerCall) {
-        switch (data.f) {
-        case 'line':
-            return Line.from(data);
-        case 'str':
-            return Str.from(data);
-        default:
-            throw new Error(`Unknown call type: ${(data as any).f}`);
+class Circle {
+    constructor(public data: CircleCall) {}
+  
+    static from(data: CircleCall): Circle {
+        return new Circle(data);
+    }
+
+    getHandles(): { x: number; y: number }[] {
+        const [x, y, r] = this.data.args;
+        return [
+            { x, y },           // Pusat
+            { x: x + r, y }     // Titik pada radius
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        switch (index) {
+            case 0:
+                const [_, __, r0] = this.data.args;
+                this.data.args = [x, y, r0];
+                break;
+            case 1:
+                const [cx, cy, _r] = this.data.args;
+                this.data.args[2] = x - cx;
+                break;
         }
     }
 }
+  
+class Disc extends Circle {
+    static from(data: CircleCall): Disc {
+        return new Disc(data);
+    }
+}
+  
+class Ellipse {
+    constructor(public data: EllipseCall) {}
+  
+    static from(data: EllipseCall): Ellipse {
+        return new Ellipse(data);
+    }
+
+    getHandles(): { x: number; y: number }[] {
+        const [x, y, rx, ry] = this.data.args;
+        return [
+        { x, y },               // Pusat
+        { x: x + rx, y },       // Titik pada radius x
+        { x, y: y + ry }        // Titik pada radius y
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        const [cx, cy, rx, ry] = this.data.args;
+        switch (index) {
+            case 0:
+                this.data.args = [x, y, rx, ry];
+                break;
+            case 1:
+                this.data.args[2] = x - cx;
+                break;
+            case 2:
+                this.data.args[3] = y - cy;
+                break;
+        }
+    }
+}
+
+class FilledEllipse extends Ellipse {
+    static from(data: EllipseCall): FilledEllipse {
+        return new FilledEllipse(data);
+    }
+}
+  
+class Arc {
+    constructor(public data: ArcCall) {}
+
+    static from(data: ArcCall): Arc {
+        return new Arc(data);
+    }
+
+    getHandles(): { x: number; y: number }[] {
+        const [x, y, r, startAngle, endAngle] = this.data.args;
+        // Konversi derajat ke radian
+        const toRadians = (angle: number) => (angle * Math.PI) / 180;
+        return [
+        { x, y }, // Pusat
+        { x: x + r, y }, // Titik pada radius (asumsi sudut 0 derajat)
+        {
+            x: x + r * Math.cos(toRadians(startAngle)),
+            y: y + r * Math.sin(toRadians(startAngle))
+        },
+        {
+            x: x + r * Math.cos(toRadians(endAngle)),
+            y: y + r * Math.sin(toRadians(endAngle))
+        }
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        const [cx, cy, r, start, end] = this.data.args;
+        switch (index) {
+            case 0:
+                this.data.args[0] = x;
+                this.data.args[1] = y;
+                break;
+            case 1:
+                this.data.args[2] = Math.hypot(x - cx, y - cy);
+                break;
+            case 2:
+                this.data.args[3] = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+                break;
+            case 3:
+                this.data.args[4] = Math.atan2(y - cy, x - cx) * 180 / Math.PI;
+                break;
+        }
+    }
+}
+  
+  
+type LayerWrapper = Line | Str | Circle | Disc | Ellipse | FilledEllipse | Arc;
+
+class LayerFactory {
+    static from(data: LayerCall): LayerWrapper {
+        switch (data.f) {
+        case 'drawLine':
+            return Line.from(data);
+        case 'drawStr':
+            return Str.from(data);
+        case 'drawCircle':
+            return Circle.from(data);
+        case 'drawDisc':
+            return Disc.from(data);
+        case 'drawEllipse':
+            return Ellipse.from(data);
+        case 'drawFilledEllipse':
+            return FilledEllipse.from(data);
+        case 'drawArc':
+            return Arc.from(data);
+        default:
+            throw new Error(`Unknown draw type: ${(data as any).f}`);
+        }
+    }
+}
+  
 
 /*
     usage:
