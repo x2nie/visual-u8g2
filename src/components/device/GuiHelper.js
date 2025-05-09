@@ -51,7 +51,7 @@ export default class GuiHelper extends Component{
         const handle = handles[handleIndex]
 
         const logical_parameters = this.env.editor.getFunctionParameter(layer.l, layer.c)
-        console.log('original:', logical_parameters)
+        // console.log('original:', logical_parameters)
 
         //? save state, so "layer" becoming persistent during dragging until mouse-up
         // const {x,y,w,h} = layer.bound;

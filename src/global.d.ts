@@ -23,7 +23,7 @@ declare module "bdf-canvas" {
 
         init(bdf: any): void;
 
-        measureText(text: string): any;
+        measureText(text: string): {width:number; height:number};
 
         parse(bdf: any): void;
 

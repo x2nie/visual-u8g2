@@ -159,7 +159,7 @@ class Str {
                 this.data.args = [x, y, c];
                 break
         }
-        console.log('ori:',[a,b,c], 'then:',[x, y, c])
+        // console.log('ori:',[a,b,c], 'then:',[x, y, c])
         this.updateBound()
     }
     
