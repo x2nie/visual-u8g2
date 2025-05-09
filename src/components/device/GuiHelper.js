@@ -44,7 +44,7 @@ export default class GuiHelper extends Component{
         const obj = LayerFactory.from(layer)
         const handles = obj.getHandles();
         let handleIndex = handles.findIndex(h => mouseInHandle(cx,cy, h))
-        if(handleIndex==-1) handleIndex = 0
+        if(handleIndex==-1) handleIndex = handles.findIndex(h => h.type=='whole' || h.type=='centroid')
         const handle = handles[handleIndex]
 
         const logical_parameters = this.env.editor.getFunctionParameter(layer.l, layer.c)

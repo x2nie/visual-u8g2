@@ -97,20 +97,20 @@ class Line {
     getHandles(): Handle[] {
         const [x, y, x2, y2] = this.data.args;
         return [
-        { x, y, type:'whole' },          
-        { x, y, type:'start' },          
-        { x: x2, y: y2, type:'end' }     
+            { x, y, type:'start' }, //? must be before whole as it it compared first
+            { x, y, type:'whole' },          
+            { x: x2, y: y2, type:'end' }     
         ];
     }
     moveHandle(index: number, x: number, y: number) {
         const [a, b, c, d] = this.data.args;
         switch (index) {
             case 0:
-                const [w,h] = [c - a, d -b];
-                this.data.args = [x, y, x+w, y+h];
+                this.data.args = [x, y, c, d];
                 break;
             case 1:
-                this.data.args = [x, y, c, d];
+                const [w,h] = [c - a, d -b];
+                this.data.args = [x, y, x+w, y+h];
                 break;
             case 2:
                 this.data.args = [a, b, x, y]
