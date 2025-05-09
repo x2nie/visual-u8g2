@@ -1,9 +1,14 @@
 .layer {
     background: transparent;
+    cursor: default;
+    border-left: 3px solid transparent;
     transition: background 0.5s;
     
-    &.active {
+    &.hover {
         background: rgba(0, 140, 255, 0.192);
         transition: background 0.075s;
+    }
+    &.selected {
+        border-left-color: lime;
     }
 }

@@ -19,6 +19,8 @@ type LineCall = {
 type StrCall = {
     f: 'drawStr';
     args: [number, number, string];
+    width?: number;
+    height?: number;
     } & CallCommon;
 
 type CircleCall = {

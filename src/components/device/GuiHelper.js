@@ -38,10 +38,11 @@ export default class GuiHelper extends Component{
     }
 
     onMouseDown(ev) {
-        if(!this.layer)
-            return
         const [cx,cy] = [ev.offsetX, ev.offsetY]
-        const layer = this.layer
+        const layer = this.controller.current = layerAt(cx,cy, this.sim.layers)
+        if(!layer)
+            return
+
         this.state.dragging = true;
         const obj = LayerFactory.from(layer)
         const handles = obj.getHandles();
@@ -53,19 +54,25 @@ export default class GuiHelper extends Component{
         console.log('original:', logical_parameters)
 
         //? save state, so "layer" becoming persistent during dragging until mouse-up
-        const {x,y,w,h} = layer.bound;
-        const args = [...this.layer.args];  //actual value passed to u8g2.function()
+        // const {x,y,w,h} = layer.bound;
+        const args = [...layer.args];  //actual value passed to u8g2.function()
         let [laxtx,lasty] = [cx,cy]
+        let moved = false;
 
         const mouseMoved = ev => {
             if(ev.offsetX==laxtx && ev.offsetY==lasty) return; //? dont redraw too fast
             laxtx = ev.offsetX;
             lasty = ev.offsetY;
 
+            if(!moved){ //? this is first time moved, so its time to create a new undo group
+                moved = true
+                this.controller.beginUndoGroup()
+            }
+
             const dx = ev.offsetX - cx;
             const dy = ev.offsetY - cy;
             // console.log(`distance: x:${dx} y:${dy}`)
-            const layer = this.layer
+            // const layer = this.layer
             // layer.bound.x = x +  dx;
             // layer.bound.y = y +  dy;
             // layer.args[0] = args[0] +  dx;
@@ -82,6 +89,7 @@ export default class GuiHelper extends Component{
     
         this.canvas.addEventListener("mouseup", () => {
             this.state.dragging = false;
+            this.controller.endUndoGroup(); // end of undo items group
             this.canvas.removeEventListener("mousemove", mouseMoved);
         });
     }
@@ -182,11 +190,44 @@ export default class GuiHelper extends Component{
         const ctx = canvas.getContext('2d')
         ctx.clearRect(0,0,canvas.width, canvas.height)
 
-        const layer = this.controller.hover;
-        if(layer){
-            const s = this.sim.scale
-            const [hor,ver] = this.sim.display.screenRatio;
-            const obj = LayerFactory.from(layer)
+        const drawBound = (layer) => {
+            if(layer == null) return
+            if(!layer.bound){
+                const obj = LayerFactory(layer)
+                obj.updateBound()
+            }
+
+            // ctx.fillStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
+            // ctx.setLineDash([3, 5]);
+            ctx.strokeStyle = 'white';
+            
+            let {x,y,w,h} = layer.bound;
+            w++;
+            h++;
+            // console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
+            // ctx.rect(x, y, w, h);
+            // ctx.strokeRect(x, y, w, h);
+            if(['drawDisc','drawCircle','drawEllipse'].includes(layer.f) ){
+                const rx = w / 2;
+                const ry = h / 2;
+                const cx = x + w / 2;
+                const cy = y + h / 2;
+                ctx.beginPath()
+                ctx.ellipse(cx*s*hor, cy*s*ver, rx*s*hor, ry*s*ver, 0, 0, 2* Math.PI);
+                ctx.stroke();
+            } else {
+                ctx.strokeRect(x*s*hor, y*s*ver, w*s*hor, h*s*ver);
+            }
+            //this.drawHintLayer()
+        }
+
+        const s = this.sim.scale
+        const [hor,ver] = this.sim.display.screenRatio;
+        const current = this.controller.current;
+        if(current){
+            const obj = LayerFactory.from(current)
             const handles = obj.getHandles()
             ctx.fillStyle = 'lime';
             handles.forEach(({x,y, type}) =>{
@@ -221,32 +262,13 @@ export default class GuiHelper extends Component{
                     }
             })
             // ctx.fill();
-
-            // ctx.fillStyle = 'white';
-            ctx.lineWidth = 2;
-            ctx.lineWidth = 1;
-            // ctx.setLineDash([3, 5]);
-            ctx.strokeStyle = 'white';
-            
-            let {x,y,w,h} = layer.bound;
-            w++;
-            h++;
-            // console.log(`${layer.f} x:${x} y:${y} layer:`, layer ? layer.bound: null)
-            // ctx.rect(x, y, w, h);
-            // ctx.strokeRect(x, y, w, h);
-            if(['drawDisc','drawCircle','drawEllipse'].includes(layer.f) ){
-                const rx = w / 2;
-                const ry = h / 2;
-                const cx = x + w / 2;
-                const cy = y + h / 2;
-                ctx.beginPath()
-                ctx.ellipse(cx*s*hor, cy*s*ver, rx*s*hor, ry*s*ver, 0, 0, 2* Math.PI);
-                ctx.stroke();
-            } else {
-                ctx.strokeRect(x*s*hor, y*s*ver, w*s*hor, h*s*ver);
-            }
-            //this.drawHintLayer()
+            drawBound(current)
         }
+        const hover = this.controller.hover;
+        if(hover){
+            drawBound(hover)
+        }
+
     }
     
     drawHintLayer(){

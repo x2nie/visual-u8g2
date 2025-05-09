@@ -5,28 +5,31 @@ import * as esprima from 'esprima';
 import './themes'
 import './lang_ino'
 import { transpile } from "../../util/cpp2javascript";
+import { useController } from "../../Controller";
 
 
 export class Editor extends Component {
     static template = "EditorComponent";
 
     setup() {
+        this.controller = useController();
         this.sim = useState(this.env.sim);
         this.editorRef = useRef("editorContainer");
         this.env.editor.editLine = this.editLine.bind(this);
         this.env.editor.getFunctionParameter = this.getFunctionParameter.bind(this);
 
         useEffect((el) => {
-        this.editor = monaco.editor.create(el, {
-            // value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
-            value: this.env.editor.content,
-            // language: "cpp",
-            language: "ino",
-            // theme: "vs-dark",
-            theme: "tomorrow-night",
-            automaticLayout: true,
-        });
-        this.editor.onDidChangeModelContent(
+            this.editor = monaco.editor.create(el, {
+                // value: "// Tulis kode kamu di sini\n"+SAMPLE_CPP,
+                value: this.env.editor.content,
+                // language: "cpp",
+                language: "ino",
+                // theme: "vs-dark",
+                theme: "tomorrow-night",
+                automaticLayout: true,
+            });
+            this.controller.setEditor(this.editor)
+            this.editor.onDidChangeModelContent(
             this.editorChange.bind(this)
         )
         }, 
@@ -36,12 +39,12 @@ export class Editor extends Component {
     async editLine(tasks) {
         const model = this.editor.getModel();
         const edits = tasks.map(([lineNums, texts]) => {
-        const [firstLine,firstCol,lastLine] = lineNums;
-        return {
-            range: new monaco.Range(firstLine, firstCol, lastLine, model.getLineMaxColumn(lastLine)),
-            text: texts.join('\n'),
-            forceMoveMarkers: true
-        }
+            const [firstLine,firstCol,lastLine] = lineNums;
+            return {
+                range: new monaco.Range(firstLine, firstCol, lastLine, model.getLineMaxColumn(lastLine)),
+                text: texts.join('\n'),
+                forceMoveMarkers: true
+            }
         })
         model.pushEditOperations([], edits, () => null);
 

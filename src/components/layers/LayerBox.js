@@ -29,7 +29,7 @@ LayerBox.template = xml`
             t-on-mouseenter="itemMouseEnter" 
             t-on-click="itemClick" 
             t-att-item="layer_index" 
-            t-att-class="{active: layer==controller.hover}"
+            t-att-class="{hover: layer==controller.hover, selected: layer==controller.current}"
         >
             <t t-out="layer.f" />
         </div>
