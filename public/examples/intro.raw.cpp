@@ -1,10 +1,14 @@
+void setup(void) {
+    //u8g2.begin(/* menu_select_pin= */ 5, /* menu_next_pin= */ 4, /* menu_prev_pin= */ 2, /* menu_home_pin= */ 3);
+    //u8g2.setFont(u8g2_font_helvB12_tr);
+}
 
-void draw(U8G2 u8g2) {
+void draw(void) {
     // WARNING: ⚠️ DO NOT PASTE CODE FROM OTHERS INTO THIS WINDOW ⚠️
 
     u8g2.setDrawColor(1);
-    u8g2.drawPixel(1, 0);
-    u8g2.drawPixel(3, 0);
+    // u8g2.drawPixel(1, 0);
+    // u8g2.drawPixel(3, 0);
     u8g2.setFont(u8g2_font_5x8);
     u8g2.drawStr(1,16,"Hi, this editor supports");
     u8g2.drawStr(1,32,"a tiny bit of C++ transp.");
@@ -13,4 +17,10 @@ void draw(U8G2 u8g2) {
     // Datatypes get translated to "var": (u)int(8,16,32)(_t), float, double
 
     // this code gets eval(..)'ed in the background with an fake u8g2 instance mapped to the HTML5 Canvas above
+}
+
+void loop(void) {
+    // u8g2.setDisplayRotation(U8G2_R0);
+    // u8g2.setFlipMode(0);
+    draw();
 }

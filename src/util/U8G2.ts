@@ -1,3 +1,4 @@
+import { loadFile } from "@odoo/owl";
 import { Display } from "../displays/DisplayApi";
 // import courB12 from "bundle-text:../bdf/courB12.bdf";
 import { BDFFont } from 'bdf-canvas';
@@ -593,33 +594,31 @@ export class U8G2 {
         this.font = font;
     }
 
-    private _loadFont() {
+    private async _loadFont() {
         const fontName = this.font.slice("u8g2_font_".length);
         const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName].bdfFont;
 
         if (bdfFont) {
             return bdfFont as BDFFont;
         } else {
-            const fetchFont = (fName: string) => {
-                fetch("./bdf/" + fName + ".bdf")
-                    .then(resp => resp.text())
-                    .then(text => {
-                        this.bdfFonts[fName] = { bdfFont: new BDFFont(text) };
-                        console.log("got font" + fName, this.bdfFonts[fName]);
-                    })
-                    .catch(e => console.log(e));
+            const fetchFont = async (fName: string) => {
+                const text = await loadFile("./bdf/" + fName + ".bdf")
+                this.bdfFonts[fName] = { bdfFont: new BDFFont(text) };
+                console.log("got font" + fName, this.bdfFonts[fName]);
+                    // .catch(e => console.log(e));
             };
             // fetch font from server
-            this.bdfFonts[fontName] = { bdfFont: null };
-            fetchFont(fontName);
+            // this.bdfFonts[fontName] = { bdfFont: null };
+            await fetchFont(fontName);
 
             // return dummy until loaded
-            return new BDFFont(courB12);
+            // return new BDFFont(courB12);
+            return this.bdfFonts[fontName].bdfFont;
         }
     }
 
-    drawStr(x: number, y: number, str: string) {
-        const bdfFont = this._loadFont();
+    async drawStr(x: number, y: number, str: string) {
+        const bdfFont = await this._loadFont();
         bdfFont.drawText(this.ctx, str, x, y - 1);
     }
 

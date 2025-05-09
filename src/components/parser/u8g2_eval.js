@@ -39,7 +39,7 @@ export const _U8G2_EVAL = {
         add('drawEllipse', getLinenumber(), [x0, y0, rx, ry, ...opt])
     },
     setFont: function(fontName) {
-        add('setFont', getLinenumber(), [fontName])
+        // add('setFont', getLinenumber(), [fontName])
     },
     clear: ()=>{},
     begin: ()=>{},
