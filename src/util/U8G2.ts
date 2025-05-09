@@ -11,9 +11,10 @@ const U8G2_DRAW_ALL = (U8G2_DRAW_UPPER_RIGHT|U8G2_DRAW_UPPER_LEFT|U8G2_DRAW_LOWE
     
 
 export interface FontMap {
-    [key: string]: {
-        bdfFont: { drawText(ctx: CanvasRenderingContext2D, str: string, x: number, y: number): void } | null
-    };
+    [key: string]: BDFFont
+    // [key: string]: Promise<{
+    //     bdfFont: { drawText(ctx: CanvasRenderingContext2D, str: string, x: number, y: number): void } | null
+    // }>;
 }
 
 export function runCode(u8g2: U8G2, code: string){
@@ -24,6 +25,7 @@ export class U8G2 {
     private drawColor = 0;
     private font: string = "";
     private bdfFonts: FontMap = {};
+    private fontFetchCache = new Map();
 
     constructor(private ctx: CanvasRenderingContext2D, private display: Display) {
         this.ctx.lineWidth = 1;
@@ -594,32 +596,42 @@ export class U8G2 {
         this.font = font;
     }
 
-    private async _loadFont() {
-        const fontName = this.font.slice("u8g2_font_".length);
-        const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName].bdfFont;
+    private async _loadFont(font:string) {
+        const fontName = font.slice("u8g2_font_".length);
+        // const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
+        if (this.fontFetchCache.has(fontName)) {
+            return this.fontFetchCache.get(fontName); // return promise yg sudah ada
+        }
 
-        if (bdfFont) {
-            return bdfFont as BDFFont;
-        } else {
-            const fetchFont = async (fName: string) => {
-                const text = await loadFile("./bdf/" + fName + ".bdf")
-                this.bdfFonts[fName] = { bdfFont: new BDFFont(text) };
-                console.log("got font" + fName, this.bdfFonts[fName]);
-                    // .catch(e => console.log(e));
-            };
+        // if (bdfFont) {
+        //     return bdfFont as BDFFont;
+        // } else {
             // fetch font from server
+            const fetchPromise = fetch("./bdf/" + fontName + ".bdf")
+                .then(resp => resp.text())
+                .then(text => {
+                    const font = new BDFFont(text) ;
+                    this.bdfFonts[fontName] = font
+                    console.log("got font" + fontName, this.bdfFonts[fontName]);
+                    return font;
+                })
+                    // .catch(e => console.log(e));
             // this.bdfFonts[fontName] = { bdfFont: null };
-            await fetchFont(fontName);
+            // await fetchFont(fontName);
 
             // return dummy until loaded
             // return new BDFFont(courB12);
-            return this.bdfFonts[fontName].bdfFont;
-        }
+            // return this.bdfFonts[fontName].bdfFont;
+            
+        // }
+        this.fontFetchCache.set(fontName, fetchPromise);
+        return fetchPromise;
     }
 
-    async drawStr(x: number, y: number, str: string) {
-        const bdfFont = await this._loadFont();
-        bdfFont.drawText(this.ctx, str, x, y - 1);
+    drawStr(x: number, y: number, str: string) {
+        this._loadFont(this.font).then(bdfFont => {
+            bdfFont.drawText(this.ctx, str, x, y - 1);
+        })
     }
 
     drawGlyph(x: number, y: number, encoding: number) {
@@ -687,7 +699,7 @@ export class U8G2 {
 
     getMaxCharWidth() {
         const fontName = this.font.slice("u8g2_font_".length);
-        const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName].bdfFont;
+        const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
 
         if (bdfFont) {
             let bf = (bdfFont as any);
@@ -710,7 +722,7 @@ export class U8G2 {
 
     getMaxCharHeight() {
         const fontName = this.font.slice("u8g2_font_".length);
-        const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName].bdfFont;
+        const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
 
         if (bdfFont) {
             let bf = (bdfFont as any);

@@ -125,11 +125,19 @@ function extractFunctionParams(code, startColumn=0) {
 
     let current = '';
     let parenDepth = 0;
+    let inString = false;
 
     for (let i = 0; i < paramStr.length; i++) {
         const char = paramStr[i];
 
-        if (char === ',' && parenDepth === 0) {
+        if (char === '"' ) {
+            inString = !inString
+            current += char;
+        } 
+        else if(inString) {
+            current += char;
+        } 
+        else if (char === ',' && parenDepth === 0) {
             // params.push(current.trim());
             params.push(current);
             current = '';

@@ -145,12 +145,24 @@ class Str {
         this.data.args[0] += dx;
         this.data.args[1] += dy;
     }
-    getHandles(): { x: number; y: number }[] {
+    getHandles(): Handle[] {
         const [x, y] = this.data.args;
         return [
-        { x, y },           // baseline
+        { x, y, type:'centroid' },           // baseline
         ];
     }
+
+    moveHandle(index: number, x: number, y: number) {
+        const [a, b, c] = this.data.args;
+        switch (index) {
+            case 0:
+                this.data.args = [x, y, c];
+                break
+        }
+        console.log('ori:',[a,b,c], 'then:',[x, y, c])
+        this.updateBound()
+    }
+    
 
     updateBound() {
         const [x, y, text] = this.data.args;

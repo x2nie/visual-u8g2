@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shared Fetch Example</title>
+  <style>
+    .file-box {
+      border: 1px solid #ccc;
+      padding: 1em;
+      margin-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="file-box" data-url="/bdf/5x8.bdf">Loading file...</div>
+  <div class="file-box" data-url="/bdf/5x8.bdf">Loading file...</div>
+  <div class="file-box" data-url="/bdf/5x8.bdf">Loading file...</div>
+
+  <script>
+    // Cache untuk menyimpan promise fetch berdasarkan URL
+    const fontFetchCache = new Map();
+
+    function fetchBinaryFile(url) {
+        if (fontFetchCache.has(url)) {
+            return fontFetchCache.get(url); // return promise yg sudah ada
+        }
+
+        const fetchPromise = fetch(url)
+        .then(response => {
+            if (!response.ok) 
+                throw new Error(`Fetch failed: ${response.status}`);
+            return response.text(); // bisa arrayBuffer() jika binary
+        })
+        .finally(() => {
+            // Optional: bersihkan jika hanya ingin cache sementara
+            // fetchCache.delete(url);
+        });
+
+        fontFetchCache.set(url, fetchPromise);
+        return fetchPromise;
+    }
+
+    // Ambil semua div dan fetch sesuai URL
+    document.querySelectorAll('.file-box').forEach(div => {
+        const url = div.getAttribute('data-url');
+
+        fetchBinaryFile(url).then(data => {
+            div.textContent = `File loaded:\n${data.slice(0, 200)}...`; // tampilkan 200 karakter pertama
+        }).catch(err => {
+            div.textContent = `Error: ${err.message}`;
+        });
+    });
+  </script>
+
+</body>
+</html>

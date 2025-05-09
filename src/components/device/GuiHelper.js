@@ -138,6 +138,9 @@ export default class GuiHelper extends Component{
             else {
                 const oldActual = oldArgs[i];  // received by func.call
                 const delta = val - oldActual;
+                if(delta==0 || val == oldActual){
+                    return param
+                }
                 const operator = delta < 0? ' - ': ' + ';
                 const newNum = Math.abs(delta)
                 return `${param}${operator}${newNum}`
