@@ -9,6 +9,7 @@ import { Component, useEffect, useRef, useState, xml } from "@odoo/owl";
 import { runCode, U8G2 } from "../../util/U8G2";
 import { layerAt } from "./layerFinder";
 import { LayerFactory, mouseInHandle } from "../layers/Layer";
+import { useController } from "../../Controller";
 
 export default class GuiHelper extends Component{
     setup(){
@@ -17,6 +18,7 @@ export default class GuiHelper extends Component{
         this.canvas = null;
         this.ctx = null;
         this.sim = useState(this.env.sim);
+        this.controller = useController()
         this.layer = null; // layer on mouse move
 
         useEffect(
@@ -30,8 +32,8 @@ export default class GuiHelper extends Component{
         )
 
         useEffect(
-            (layer) =>{},
-            () => [this.state.hoverLayer]
+            () =>this.drawHelper(),
+            () => [this.controller.current, this.controller.hover]
         )
     }
 
@@ -159,10 +161,10 @@ export default class GuiHelper extends Component{
         this.state.y = y;
 
         const layer = layerAt(x,y, this.sim.layers)
-        if(layer==this.layer) 
+        if(layer==this.controller.hover) 
             return; // no ui update is needed
 
-        this.layer=layer;
+        this.controller.hover=layer;
         // debugger
         //this.obj = LayerFactory.from(layer)
         // console.log(`x:${x} y:${y} layer:`)
@@ -180,7 +182,7 @@ export default class GuiHelper extends Component{
         const ctx = canvas.getContext('2d')
         ctx.clearRect(0,0,canvas.width, canvas.height)
 
-        const layer = this.layer;
+        const layer = this.controller.hover;
         if(layer){
             const s = this.sim.scale
             const [hor,ver] = this.sim.display.screenRatio;

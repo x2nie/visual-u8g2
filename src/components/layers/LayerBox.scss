@@ -1,0 +1,9 @@
+.layer {
+    background: transparent;
+    transition: background 0.5s;
+    
+    &.active {
+        background: rgba(0, 140, 255, 0.192);
+        transition: background 0.075s;
+    }
+}

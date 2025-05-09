@@ -1,6 +1,7 @@
 import { loadFile, mount, reactive, whenReady } from "@odoo/owl";
 import App from './App'
 import { nokia3210 } from "./displays/Displays";
+import { createController } from "./Controller";
 
 whenReady(async function () {
 
@@ -13,6 +14,7 @@ whenReady(async function () {
   ])
 
   const env = {
+    controller: createController(),
     editor: reactive({
               content: cpp_content,
               editLine: ()=>{}, //changed later by Editor
