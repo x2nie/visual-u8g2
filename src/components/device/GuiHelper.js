@@ -196,7 +196,7 @@ export default class GuiHelper extends Component{
         const drawBound = (layer) => {
             if(layer == null) return
             if(!layer.bound){
-                const obj = LayerFactory(layer)
+                const obj = LayerFactory.from(layer)
                 obj.updateBound()
             }
 
