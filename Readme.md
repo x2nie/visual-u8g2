@@ -7,6 +7,8 @@ git clone --branch master https://github.com/rhovious/u8g2-simulator.git
 ```
 ---
 
+![screenshot with skin](doc/images/main-screenshot.png "Screeshoot with "Nokia 3210" skin")
+
 This is an attempt to speed up UI development for Arduino projects using the U8G2 library ([https://github.com/olikraus/u8g2/](https://github.com/olikraus/u8g2/)).
 
 You can see a running demo here: [https://p3dt.net/u8g2sim/](https://p3dt.net/u8g2sim/)
