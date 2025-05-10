@@ -679,6 +679,9 @@ export class U8G2 {
         }
     }
 
+    drawXBMP(x0: number, y0: number, w: number, h: number, bitmap: number[]) {
+        return this.drawXBM(x0, y0, w, h, bitmap)
+    }
     drawXBM(x0: number, y0: number, w: number, h: number, bitmap: number[]) {
         // first find out the real width of the xbm
         const fixedW = w % 8 === 0 ? w : (Math.floor(w / 8) + 1) * 8;

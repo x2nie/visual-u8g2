@@ -12,7 +12,8 @@ whenReady(async function () {
     // loadFile("examples/dev1.cpp"),
     // loadFile("examples/dev_nokia_3210.cpp"),
     // loadFile("examples/intro.raw.cpp"),
-    loadFile("examples/clock.raw.cpp"),
+    // loadFile("examples/clock.raw.cpp"),
+    loadFile("examples/dev4-xbm.cpp"),
   ])
 
   const env = {

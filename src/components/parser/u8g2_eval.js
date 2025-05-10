@@ -38,6 +38,12 @@ export const _U8G2_EVAL = {
     drawEllipse: function(x0, y0, rx, ry, ...opt) {
         add('drawEllipse', getLinenumber(), [x0, y0, rx, ry, ...opt])
     },
+    drawXBMP: function(x0, y0, w, h, txt) {
+        add('drawXBMP', getLinenumber(), [x0, y0, w, h, txt])
+    },
+    drawXBM: function(x0, y0, w, h, txt) {
+        add('drawXBM', getLinenumber(), [x0, y0, w, h, txt])
+    },
     setFont: function(fontName) {
         // add('setFont', getLinenumber(), [fontName])
     },

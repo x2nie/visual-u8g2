@@ -58,6 +58,11 @@ type FrameCall = {
     args: [number, number, number, number]; // x, y, w, h
     } & CallCommon;
       
+type BitmapCall = {
+    f: 'drawXBM' | 'drawXBMP';
+    args: [number, number, number, number]; // x, y, w, h
+    } & CallCommon;
+      
 export type LayerCall =
     | LineCall
     | StrCall
@@ -67,6 +72,7 @@ export type LayerCall =
     // | FilledEllipseCall
     | ArcCall
     | TriangleCall
+    | BitmapCall
     | FrameCall;
 
 export type Handle = {
@@ -148,7 +154,7 @@ class Str {
     getHandles(): Handle[] {
         const [x, y] = this.data.args;
         return [
-        { x, y, type:'centroid' },           // baseline
+        { x, y, type:'start' },           // baseline
         ];
     }
 
@@ -174,6 +180,48 @@ class Str {
     toString(): string {
         const [x, y, text] = this.data.args;
         return `Text "${text}" at (${x}, ${y})`;
+    }
+}
+
+class Xbm {
+    constructor(public data: BitmapCall) {}
+
+    static from(data: BitmapCall): Xbm {
+        return new Xbm(data);
+    }
+
+    move(dx: number, dy: number) {
+        this.data.args[0] += dx;
+        this.data.args[1] += dy;
+    }
+    getHandles(): Handle[] {
+        const [x, y, w, h] = this.data.args;
+        return [
+            { x, y, type:'start' },           // baseline
+            { x: x+w-1, y: y+h-1, type:'end' }     
+        ];
+    }
+
+    moveHandle(index: number, x: number, y: number) {
+        const [a, b, c, d] = this.data.args;
+        switch (index) {
+            case 0:
+                this.data.args[0] = x;
+                this.data.args[1] = y;
+                break
+            case 1:
+                this.data.args[2] = x-a+1;
+                this.data.args[3] = y-b+1;
+                break
+        }
+        // console.log('ori:',[a,b,c], 'then:',[x, y, c])
+        this.updateBound()
+    }
+    
+
+    updateBound() {
+        const [x, y, w, h] = this.data.args;
+        this.data.bound = { x, y, w:w-1, h:h-1 };
     }
 }
   
@@ -391,6 +439,7 @@ class Box extends Frame {
 export type LayerWrapper =
     | Line
     | Str
+    | Xbm
     | Circle
     | Disc
     | Ellipse
@@ -413,6 +462,8 @@ export class LayerFactory {
             case 'drawTriangle': return Triangle.from(data);
             case 'drawFrame': return Frame.from(data);
             case 'drawBox': return Box.from(data);
+            case 'drawXBMP':
+            case 'drawXBM': return Xbm.from(data);
         default:
             throw new Error(`Unknown draw type: ${(data as any).f}`);
         }
