@@ -34,6 +34,19 @@ class Controller {
     redo(){
         this.editor.trigger(sender, 'redo', null)
     }
+
+    insertLine(firstLine:number, firstCol:number, lastLine:number, lastCol:number, text: string){
+        // const model = this.editor.getModel();
+        const edits = [
+            // const [firstLine,firstCol,lastLine] = lineNums;
+            {
+                range: new monaco.Range(firstLine, firstCol, lastLine, lastCol),
+                text,
+                forceMoveMarkers: true
+            }
+        ]
+        this.model.pushEditOperations([], edits, () => null);
+    }
 }
 
 //? create a global object accessed via this.env or useController
