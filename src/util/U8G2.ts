@@ -615,6 +615,10 @@ export class U8G2 {
                 .then(text => {
                     const lFont = new BDFFont(text) ;
                     this.bdfFonts[fontName] = lFont;
+                    //bugfix nokia,etc
+                    Object.values(lFont.glyphs).forEach(glyph => {
+                        glyph.DWIDTH.y = glyph.DWIDTH.y || 0;
+                    });
                     //set the baseline
                     // lFont._vRef = lFont.SIZE.size - lFont.properties.FONT_DESCENT
                     // lFont._vRef = lFont.properties.FONT_DESCENT
@@ -637,7 +641,6 @@ export class U8G2 {
 
     drawStr(x: number, y: number, str: string) {
         this._loadFont(this.font).then(bdfFont => {
-            // debugger
             bdfFont.drawText(this.ctx, str, x, y /* - bdfFont._vRef */ - 1);
         })
     }

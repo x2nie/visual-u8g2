@@ -9,12 +9,17 @@ void draw(void) {
     u8g2.setDrawColor(1);
     u8g2.drawLine(0,0,5,0);
     
+
+    //* this text position must be exactly the same
+    //* compared visually to https://wokwi.com/projects/387831447146245121
     u8g2.setFont(u8g2_font_6x10);
     u8g2.drawStr(2, 9, "Dust Collector");
+
+
     // u8g2.drawPixel(1, 0);
     // u8g2.drawPixel(3, 0);
-    u8g2.setFont(nokia_3310_small);
-    u8g2.drawStr(1, 16, "Hi, this editor supports");
+    u8g2.setFont(nokia_3310_small_bold);
+    u8g2.drawStr(1, 18, "Hi, this editor supports");
     u8g2.drawStr(1, 32, "a tiny bit of C++ transp.");
     u8g2.drawStr(1,48,"but it is infact javascript");
     // this should help you copy and paste the "c++" code to the Arduino IDE
