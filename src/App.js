@@ -13,7 +13,7 @@ export default class App extends Component {
     static template = "App"
 
     setup(){
-        this.heights = useState({navbar:48, preview:215})
+        this.heights = useState({navbar:48, preview:380})
         this.sim = useState(this.env.sim);
     }
    
