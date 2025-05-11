@@ -599,8 +599,8 @@ export class U8G2 {
         this.font = font;
     }
 
-    private async _loadFont(font:string): Promise<BDFFont> {
-        const fontName = font.slice("u8g2_font_".length);
+    private async _loadFont(fontName:string): Promise<BDFFont> {
+        fontName = fontName.replace(/^u8g2_font_/, '');
         // const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
         if (this.fontFetchCache.has(fontName)) {
             return this.fontFetchCache.get(fontName); // return promise yg sudah ada
@@ -613,10 +613,14 @@ export class U8G2 {
             const fetchPromise = fetch("./bdf/" + fontName + ".bdf")
                 .then(resp => resp.text())
                 .then(text => {
-                    const font = new BDFFont(text) ;
-                    this.bdfFonts[fontName] = font
+                    const lFont = new BDFFont(text) ;
+                    this.bdfFonts[fontName] = lFont;
+                    //set the baseline
+                    // lFont._vRef = lFont.SIZE.size - lFont.properties.FONT_DESCENT
+                    // lFont._vRef = lFont.properties.FONT_DESCENT
+                    lFont._vRef = 0
                     // console.log("got font" + fontName, this.bdfFonts[fontName]);
-                    return font;
+                    return lFont;
                 })
                     // .catch(e => console.log(e));
             // this.bdfFonts[fontName] = { bdfFont: null };
@@ -633,14 +637,15 @@ export class U8G2 {
 
     drawStr(x: number, y: number, str: string) {
         this._loadFont(this.font).then(bdfFont => {
-            bdfFont.drawText(this.ctx, str, x, y - 1);
+            // debugger
+            bdfFont.drawText(this.ctx, str, x, y /* - bdfFont._vRef */ - 1);
         })
     }
 
     drawGlyph(x: number, y: number, encoding: number) {
         this._loadFont(this.font).then(bdfFont => {
             if (bdfFont.getGlyphOf(encoding)) {
-                bdfFont.drawChar(this.ctx, encoding, x, y - 1);
+                bdfFont.drawChar(this.ctx, encoding, x, y + bdfFont._vRef - 1);
             }
         })
     }
@@ -705,7 +710,7 @@ export class U8G2 {
     }
 
     getMaxCharWidth() {
-        const fontName = this.font.slice("u8g2_font_".length);
+        const fontName = this.font.replace(/^u8g2_font_/, '');
         const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
         if (bdfFont) {
             if (!bdfFont._MaxCharWidth) {
@@ -725,7 +730,7 @@ export class U8G2 {
     }
 
     getMaxCharHeight() {
-        const fontName = this.font.slice("u8g2_font_".length);
+        const fontName = this.font.replace(/^u8g2_font_/, '');
         const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
 
         if (bdfFont) {

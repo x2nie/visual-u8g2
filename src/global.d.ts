@@ -33,6 +33,7 @@ declare module "bdf-canvas" {
 
         //? helpers, for speedup
         _MaxCharWidth: number;
+        _vRef: number; // vertical reference. usually is the baseline
         
         constructor(font: string);
 
