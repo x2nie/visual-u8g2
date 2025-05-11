@@ -10,7 +10,30 @@ declare module "*.raw.cpp" {
 }
 
 declare module "bdf-canvas" {
+    interface Glyph  {
+        BITMAP: any[]
+        DWIDTH: {
+            x: number;
+            y: number;
+        }
+    }
     export class BDFFont {
+        SIZE : {
+            size:number;
+            xres:number;
+            yres:number;
+        }
+        CHARS : number;
+        DWIDTH: {
+            x: number;
+            y: number;
+        }
+        properties: {[key:string]:number};
+        glyphs: {[key:string]:Glyph}
+
+        //? helpers, for speedup
+        _MaxCharWidth: number;
+        
         constructor(font: string);
 
         drawChar(ctx: CanvasRenderingContext2D, c: number, bx: number, by: number, t?: any): any;

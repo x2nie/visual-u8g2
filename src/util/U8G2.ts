@@ -599,7 +599,7 @@ export class U8G2 {
         this.font = font;
     }
 
-    private async _loadFont(font:string) {
+    private async _loadFont(font:string): Promise<BDFFont> {
         const fontName = font.slice("u8g2_font_".length);
         // const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
         if (this.fontFetchCache.has(fontName)) {
@@ -615,7 +615,7 @@ export class U8G2 {
                 .then(text => {
                     const font = new BDFFont(text) ;
                     this.bdfFonts[fontName] = font
-                    console.log("got font" + fontName, this.bdfFonts[fontName]);
+                    // console.log("got font" + fontName, this.bdfFonts[fontName]);
                     return font;
                 })
                     // .catch(e => console.log(e));
@@ -638,10 +638,11 @@ export class U8G2 {
     }
 
     drawGlyph(x: number, y: number, encoding: number) {
-        const bdfFont = this._loadFont();
-        if (bdfFont.getGlyphOf(encoding)) {
-            bdfFont.drawChar(this.ctx, encoding, x, y - 1);
-        }
+        this._loadFont(this.font).then(bdfFont => {
+            if (bdfFont.getGlyphOf(encoding)) {
+                bdfFont.drawChar(this.ctx, encoding, x, y - 1);
+            }
+        })
     }
 
     setDrawColor(color: number) {
@@ -706,23 +707,20 @@ export class U8G2 {
     getMaxCharWidth() {
         const fontName = this.font.slice("u8g2_font_".length);
         const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
-
         if (bdfFont) {
-            let bf = (bdfFont as any);
-
-            if (!bf.getMaxCharWidth) {
+            if (!bdfFont._MaxCharWidth) {
                 let max = 0;
-                Object.keys(bf.glyphs).forEach(key => {
-                    let g = bf.glyphs[key];
+                Object.keys(bdfFont.glyphs).forEach(key => {
+                    let g = bdfFont.glyphs[key];
 
                     if (g.DWIDTH.x > max) {
                         max = g.DWIDTH.x;
                     }
                 });
-                bf.getMaxCharWidth = max;
+                bdfFont._MaxCharWidth = max;
             }
 
-            return bf.getMaxCharWidth;
+            return bdfFont._MaxCharWidth;
         }
     }
 
@@ -731,9 +729,10 @@ export class U8G2 {
         const bdfFont = this.bdfFonts[fontName] && this.bdfFonts[fontName];
 
         if (bdfFont) {
-            let bf = (bdfFont as any);
-
-            return bf.SIZE.size;
+            return bdfFont.SIZE.size;
         }
+        // this._loadFont(this.font).then(bdfFont => {
+        //     return bdfFont.SIZE.size;
+        // })
     }
 }
